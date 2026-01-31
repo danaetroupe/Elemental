@@ -1,59 +1,71 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
 using TMPro;
-using UnityEngine.UI;
+using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class InteractionController : MonoBehaviour
 {
-    [SerializeField] UnityEvent OnBoxCollide;
-    [SerializeField] UnityEvent OnBoxExit;
-    [SerializeField] UnityEvent OnItemInteraction;
-    [SerializeField] UnityEvent OnItemDisable;
+    [Header("Events")]
+    [SerializeField] private UnityEvent OnPlayerEnter;
+    [SerializeField] private UnityEvent OnPlayerExit;
+    [SerializeField] private UnityEvent OnItemInteraction;
+    [SerializeField] private UnityEvent OnItemDisable;
 
-    [SerializeField] KeyCode KEYBIND = KeyCode.E;
+    [Header("Settings")]
+    [SerializeField] private Key KEYBIND = Key.E;
 
-    private bool isColliding = false;
     private bool isInteracting = false;
+    private bool isTriggered = false;
+    private string playerTag = "Player";
+    private bool isInRange = false;
 
-    // Check for player collision
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            isColliding = true;
-            OnBoxCollide.Invoke();
-        }
-    }
-
-    // Check for end of player collision
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            isColliding = false;
-            OnBoxExit.Invoke();
-        }
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        if (!gameObject.GetComponent("BoxCollider2D"))
-        {
-            Debug.Log(gameObject.name + " does not have a box collider. InteractionController will not work as intended.");
-        }
-
-        GameObject player = GameObject.FindWithTag("Player");
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        if (isColliding && Input.GetKeyDown(KEYBIND))
+        if (isTriggered && Keyboard.current != null && Keyboard.current[KEYBIND].wasPressedThisFrame)
         {
             Interact();
+        }
+    }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.CompareTag(playerTag))
+        {
+            isInRange = true;
+            OnPlayerEnter.Invoke();
+            isTriggered = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+        if (collision.CompareTag(playerTag))
+        {
+            isInRange = false;
+            OnPlayerExit.Invoke();
+            isTriggered = false;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (gameObject.CompareTag(playerTag))
+        {
+            isInRange = true;
+            OnPlayerEnter.Invoke();
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag(playerTag))
+        {
+            isInRange = false;
+            OnPlayerExit.Invoke();
         }
     }
 
@@ -68,5 +80,11 @@ public class InteractionController : MonoBehaviour
         {
             OnItemDisable.Invoke();
         }
+    }
+
+    // Public methods for external scripts
+    public bool IsPlayerInRange()
+    {
+        return isInRange;
     }
 }

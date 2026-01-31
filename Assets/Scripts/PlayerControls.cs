@@ -1,42 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerControls : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed;
+    [SerializeField] float moveSpeed = 5f;
 
-    private Rigidbody2D rb;
-    private Vector2 movement;
-    private Animator mAnimator;
+    private Vector2 moveInput;
 
-    void Start()
+    public void OnMove(InputAction.CallbackContext context)
     {
-        rb = GetComponent<Rigidbody2D>();
-        //mAnimator = GetComponent<Animator>();
-    }
-
-    public void SetMovement()
-    {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-        movement = movement.normalized;
-    }
-
-    void HandleAnimations()
-    {
-        if (mAnimator)
-        {
-            mAnimator.SetBool("isBack", Input.GetKey(KeyCode.W));
-            mAnimator.SetBool("isRight", Input.GetKey(KeyCode.D));
-            mAnimator.SetBool("isForward", Input.GetKey(KeyCode.S));
-            mAnimator.SetBool("isLeft", Input.GetKey(KeyCode.A));
-        }
+        moveInput = context.ReadValue<Vector2>();
     }
 
     void FixedUpdate()
     {
-        SetMovement();
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
+        transform.Translate(move * moveSpeed * Time.deltaTime, Space.World);
     }
 }
