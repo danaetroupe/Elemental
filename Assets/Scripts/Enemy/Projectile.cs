@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour
 {
     private Vector3 direction;
     private float speed;
+    [SerializeField] private int damage = 10;
 
     public void Initialize(Vector3 dir, float spd)
     {
@@ -29,7 +30,7 @@ public class Projectile : MonoBehaviour
             HealthController playerHealth = other.GetComponent<HealthController>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(1);
+                playerHealth.TakeDamage(damage);
             }
             Destroy(gameObject);
         }
