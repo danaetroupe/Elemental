@@ -128,8 +128,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0c1c4085b183dd44877c07ee36ca27d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  damage: 1
+  damage: 50
   isPlayerProjectile: 0
+  lifetimeSeconds: 5
+  spinDegreesPerSecond: 360
+  spinAxis: {x: 0, y: 0, z: 1}
 --- !u!65 &8187511930278105562
 BoxCollider:
   m_ObjectHideFlags: 0
