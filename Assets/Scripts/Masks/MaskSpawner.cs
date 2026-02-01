@@ -32,7 +32,7 @@ public class MaskSpawner : MonoBehaviour
 
     public void OnEnemyDeath(Vector3 enemyPosition)
     {
-        if (!GameObject.FindGameObjectWithTag("Enemy"))
+        if (GameObject.FindGameObjectsWithTag("Enemy").Length <= 1)
         {
             OnLastEnemyDeath(enemyPosition);
         }

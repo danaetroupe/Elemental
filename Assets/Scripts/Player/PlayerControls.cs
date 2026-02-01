@@ -83,6 +83,10 @@ public class PlayerControls : NetworkBehaviour
             Debug.LogWarning("Mask does not have MaskController component!");
             return;
         }
+        else
+        {
+            maskController.DestroySprite();
+        }
 
         if (currentMask != null)
         {

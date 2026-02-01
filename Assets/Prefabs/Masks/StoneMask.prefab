@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 2611654997512979429}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11.48539, y: 2.3, z: -8.07632}
+  m_LocalPosition: {x: -5.90848, y: 0, z: 4.87559}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DirectionalPower
   cooldownTime: 2
-  projectileSpeed: 1
+  projectileSpeed: 12
   projectilePrefab: {fileID: 795956235146185913, guid: bcd2a3eae180a2e418b3bf09dd0ac39a, type: 3}
-  offset: {x: 0, y: 1, z: 0}
+  offset: {x: 0, y: 10, z: 0}
   direction: {x: 0, y: -1, z: 0}
