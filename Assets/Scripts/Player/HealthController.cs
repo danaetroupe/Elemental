@@ -14,6 +14,7 @@ public class HealthController : NetworkBehaviour
     public UnityEvent<int, int> OnHealthChanged;
 
     private int currentHealth;
+    private Vector3 spawnPosition;
     private readonly NetworkVariable<int> networkHealth = new NetworkVariable<int>(
         0,
         NetworkVariableReadPermission.Everyone,
@@ -29,6 +30,7 @@ public class HealthController : NetworkBehaviour
         if (!UseNetworkedHealth())
         {
             currentHealth = starterHealth;
+            spawnPosition = transform.position;
             OnHealthChanged?.Invoke(currentHealth, starterHealth);
         }
     }
@@ -36,6 +38,7 @@ public class HealthController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         networkHealth.OnValueChanged += HandleNetworkHealthChanged;
+        spawnPosition = transform.position;
 
         if (IsServer)
         {
@@ -102,6 +105,12 @@ public class HealthController : NetworkBehaviour
     {
         OnDeath?.Invoke(gameObject.transform.position);
 
+        if (TryGetComponent<PlayerControls>(out _))
+        {
+            Respawn();
+            return;
+        }
+
         if (TryGetComponent<NetworkObject>(out var no) && no.IsSpawned)
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
@@ -112,6 +121,36 @@ public class HealthController : NetworkBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    private void Respawn()
+    {
+        if (UseNetworkedHealth())
+        {
+            if (!NetworkManager.Singleton.IsServer) return;
+
+            // Reset health (server-authoritative via NetworkVariable)
+            networkHealth.Value = starterHealth;
+            
+            // Reset position - use ClientRpc because NetworkTransform has Owner authority
+            // The owning client must set their own position
+            TeleportToSpawnClientRpc(spawnPosition);
+        }
+        else
+        {
+            // Offline mode
+            currentHealth = starterHealth;
+            transform.position = spawnPosition;
+            OnHealthChanged?.Invoke(currentHealth, starterHealth);
+        }
+    }
+
+    [ClientRpc]
+    private void TeleportToSpawnClientRpc(Vector3 position)
+    {
+        // Each client sets their local transform position
+        // NetworkTransform with Owner authority will then sync this to others
+        transform.position = position;
     }
 
     public int GetCurrentHealth()
