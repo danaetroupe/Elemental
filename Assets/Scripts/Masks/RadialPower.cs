@@ -3,7 +3,7 @@ using UnityEngine;
 public class RadialPower : Power
 {
     [SerializeField] private int numBullets = 8;
-    public override void UsePower()
+    protected override void DoBehavior()
     {
         float angleStep = 360f / numBullets;
 

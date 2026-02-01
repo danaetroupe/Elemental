@@ -12,11 +12,10 @@ GameObject:
   - component: {fileID: 5010712837916546047}
   - component: {fileID: 6564525555515532880}
   - component: {fileID: 6304259791067714907}
-  - component: {fileID: 9104811111510456394}
   - component: {fileID: 5934710473015906238}
-  - component: {fileID: 6940477303388839312}
+  - component: {fileID: 2689408947564881103}
   m_Layer: 0
-  m_Name: WaterMask
+  m_Name: StoneMask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 806e843c9f713f44aa6eed6a45d44cbb, type: 2}
+  - {fileID: 2100000, guid: 9de463881f512cd46a7ae356a5f3ae25, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,25 +115,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &9104811111510456394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2611654997512979429}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8e7a3ee6788a2c4789035dda0fad863, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  textures:
-  - {fileID: 2800000, guid: 26abb8e0c8ffbf4429c41cbb8ab016d4, type: 3}
-  - {fileID: 2800000, guid: 4279c0c428bde124e9d8102fc539da04, type: 3}
-  - {fileID: 2800000, guid: 3990ca244bf95034cba4cc27f04daa0a, type: 3}
-  - {fileID: 2800000, guid: 28987d1b6f6a6864589da5173d27255d, type: 3}
-  - {fileID: 2800000, guid: a36491b8bc431334180d4fa0ffe1c138, type: 3}
-  frameRate: 12
 --- !u!114 &5934710473015906238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,11 +128,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskController
   characterColor: {r: 0.12416421, g: 0.5666614, b: 0.91823894, a: 1}
-  power: {fileID: 6940477303388839312}
+  power: {fileID: 2689408947564881103}
   rotationSpeed: 50
   bobSpeed: 2
   bobHeight: 0.3
---- !u!114 &6940477303388839312
+--- !u!114 &2689408947564881103
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -161,10 +141,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2611654997512979429}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11171ee90fe2cba4e8f95444fb7c3acb, type: 3}
+  m_Script: {fileID: 11500000, guid: 972b7c1477e396e448d7ed094d3d19f0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RadialPower
-  cooldownTime: 1
-  projectileSpeed: 10
-  projectilePrefab: {fileID: 795956235146185913, guid: 6d0a67ea056927e4dae54bad28b5a3db, type: 3}
-  numBullets: 8
+  m_EditorClassIdentifier: Assembly-CSharp::DirectionalPower
+  cooldownTime: 2
+  projectileSpeed: 1
+  projectilePrefab: {fileID: 795956235146185913, guid: bcd2a3eae180a2e418b3bf09dd0ac39a, type: 3}
+  offset: {x: 0, y: 1, z: 0}
+  direction: {x: 0, y: -1, z: 0}

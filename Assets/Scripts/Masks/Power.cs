@@ -12,7 +12,16 @@ public abstract class Power : MonoBehaviour
     [Header("Debug")]
     protected float lastUseTime = -999f;
 
-    public abstract void UsePower();
+    public  void UsePower()
+    {
+        if (IsReady())
+        {
+            DoBehavior();
+            lastUseTime = Time.time;
+        }
+    }
+
+    protected abstract void DoBehavior();
 
     public virtual bool IsReady()
     {

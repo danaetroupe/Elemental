@@ -47,6 +47,11 @@ public class Projectile : MonoBehaviour
         transform.position += direction * speed * Time.deltaTime;
         transform.Rotate(spinAxis, spinDegreesPerSecond * Time.deltaTime, Space.Self);
 
+        // Despawn if it falls below the play area.
+        if (transform.position.y <= 0f)
+        {
+            Despawn();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
