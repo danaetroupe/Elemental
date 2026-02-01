@@ -85,8 +85,6 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Projectile hit: {other.name} (tag: {other.tag}), isPlayerProjectile={isPlayerProjectile}", this);
-
         if (other.CompareTag("Wall"))
         {
             Despawn();

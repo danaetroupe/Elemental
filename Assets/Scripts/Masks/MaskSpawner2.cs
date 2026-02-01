@@ -1,199 +1,64 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Events;
-
 
 public class MaskSpawner2 : MonoBehaviour
 {
-    // the mask we want to spawn
+    [Header("Enemy References")]
+    [SerializeField] private List<GameObject> enemiesToTrack = new List<GameObject>();
+
     [Header("Mask Settings")]
     public GameObject maskToSpawn;
 
-    // spawn settings
     [Header("Spawn Settings")]
-    public Vector3 spawnOffset = new Vector3(0, 0.5f, 0);
+    public Vector3 spawnOffset = Vector3.up * 0.5f;
     public bool spawnAtEnemyPosition = true;
     public Transform customSpawnLocation;
-
-    // effects stuff
-    [Header("Effects")]
-    public GameObject spawnEffectPrefab;
     public float spawnDelay = 0.5f;
 
-    // private variables
     private bool hasSpawned = false;
-    private List<HealthController> enemyList = new List<HealthController>();
-    private List<UnityAction<Vector3>> handlerList = new List<UnityAction<Vector3>>();
-    private int enemyCount = 0;
-
-    private bool CheckIfWeAreTheServer()
-    {
-        if (NetworkManager.Singleton == null)
-        {
-            return true;
-        }
-        
-        if (NetworkManager.Singleton.IsListening == false)
-        {
-            return true;
-        }
-        
-        if (NetworkManager.Singleton.IsServer == true)
-        {
-            return true;
-        }
-        
-        return false;
-    }
+    private int remainingEnemies;
 
     void Start()
     {
-        bool isServer = CheckIfWeAreTheServer();
-        
-        if (isServer == false)
+        // Remove any null references from the list
+        enemiesToTrack.RemoveAll(enemy => enemy == null);
+
+        remainingEnemies = enemiesToTrack.Count;
+
+        if (remainingEnemies == 0)
         {
-            this.enabled = false;
+            Debug.LogWarning("No enemies assigned to MaskSpawner!");
             return;
         }
-        
-        FindAndRegisterAllEnemies();
-    }
 
-    void OnDisable()
-    {
-        RemoveAllListeners();
-    }
-
-    private void FindAndRegisterAllEnemies()
-    {
-        enemyList.Clear();
-        handlerList.Clear();
-        enemyCount = 0;
-
-        GameObject[] allEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-        
-        for (int i = 0; i < allEnemies.Length; i++)
+        // Subscribe to death events for each enemy in the list
+        foreach (GameObject enemy in enemiesToTrack)
         {
-            GameObject enemyObject = allEnemies[i];
-            
-            HealthController health = enemyObject.GetComponent<HealthController>();
-            
-            if (health != null)
+            HealthController healthController = enemy.GetComponent<HealthController>();
+            if (healthController != null)
             {
-                RegisterEnemy(health);
+                healthController.OnDeath.AddListener(OnEnemyDeath);
             }
-        }
-        
-    }
-
-    public void RegisterEnemy(HealthController enemy)
-    {
-        if (enemy == null)
-        {
-            return;
-        }
-        
-        bool alreadyHaveIt = false;
-        for (int i = 0; i < enemyList.Count; i++)
-        {
-            if (enemyList[i] == enemy)
+            else
             {
-                alreadyHaveIt = true;
-                break;
-            }
-        }
-        
-        if (alreadyHaveIt == true)
-        {
-            return;
-        }
-
-
-        HealthController thisEnemy = enemy;
-        UnityAction<Vector3> deathHandler = delegate(Vector3 pos) 
-        {
-            HandleEnemyDeath(thisEnemy, pos);
-        };
-        
-        enemyList.Add(enemy);
-        handlerList.Add(deathHandler);
-        
-        enemy.OnDeath.AddListener(deathHandler);
-        
-        enemyCount = enemyCount + 1;
-    }
-
-    public void UnregisterEnemy(HealthController enemy)
-    {
-        if (enemy == null)
-        {
-            return;
-        }
-        
-        int indexToRemove = -1;
-        for (int i = 0; i < enemyList.Count; i++)
-        {
-            if (enemyList[i] == enemy)
-            {
-                indexToRemove = i;
-                break;
-            }
-        }
-        
-        if (indexToRemove != -1)
-        {
-            UnityAction<Vector3> handler = handlerList[indexToRemove];
-            
-            enemy.OnDeath.RemoveListener(handler);
-            
-            enemyList.RemoveAt(indexToRemove);
-            handlerList.RemoveAt(indexToRemove);
-            
-            enemyCount = enemyCount - 1;
-            if (enemyCount < 0)
-            {
-                enemyCount = 0;
+                Debug.LogWarning($"Enemy '{enemy.name}' does not have a HealthController component!");
             }
         }
     }
 
-    private void RemoveAllListeners()
+    public void OnEnemyDeath(Vector3 enemyPosition)
     {
-        for (int i = 0; i < enemyList.Count; i++)
-        {
-            HealthController enemy = enemyList[i];
-            UnityAction<Vector3> handler = handlerList[i];
-            
-            if (enemy != null)
-            {
-                enemy.OnDeath.RemoveListener(handler);
-            }
-        }
-        
-        enemyList.Clear();
-        handlerList.Clear();
-    }
+        remainingEnemies--;
 
-    private void HandleEnemyDeath(HealthController enemy, Vector3 deathPosition)
-    {
-        if (hasSpawned == true)
+        if (remainingEnemies <= 0)
         {
-            return;
-        }
-
-        UnregisterEnemy(enemy);
-
-        if (enemyCount <= 0)
-        {
-            OnLastEnemyDeath(deathPosition);
+            OnLastEnemyDeath(enemyPosition);
         }
     }
 
     public void OnLastEnemyDeath(Vector3 enemyPosition)
     {
-        if (hasSpawned == true)
+        if (hasSpawned)
         {
             Debug.LogWarning("Mask has already been spawned!");
             return;
@@ -205,117 +70,55 @@ public class MaskSpawner2 : MonoBehaviour
             return;
         }
 
-        Vector3 whereToSpawn = GetSpawnPosition(enemyPosition);
+        Vector3 spawnPosition = DetermineSpawnPosition(enemyPosition);
 
         if (spawnDelay > 0)
         {
-            StartCoroutine(WaitThenSpawnMask(whereToSpawn));
+            Invoke(nameof(SpawnMaskDelayed), spawnDelay);
+            lastSpawnPosition = spawnPosition;
         }
         else
         {
-            DoSpawnMask(whereToSpawn);
+            SpawnMask(spawnPosition);
         }
     }
 
-    private IEnumerator WaitThenSpawnMask(Vector3 pos)
+    private Vector3 lastSpawnPosition;
+
+    private void SpawnMaskDelayed()
     {
-        yield return new WaitForSeconds(spawnDelay);
-        
-        DoSpawnMask(pos);
+        SpawnMask(lastSpawnPosition);
     }
 
-    private void DoSpawnMask(Vector3 position)
+    private void SpawnMask(Vector3 position)
     {
-        if (hasSpawned == true)
-        {
-            return;
-        }
+        // Instantiate the mask prefab
+        GameObject spawnedMask = Instantiate(maskToSpawn, position, Quaternion.Euler(90, 0, 0));
 
-        Quaternion rot = Quaternion.Euler(0, 0, 0);
-        
-        GameObject newMask = Instantiate(maskToSpawn, position, rot);
-
-        if (NetworkManager.Singleton != null)
-        {
-            if (NetworkManager.Singleton.IsListening == true)
-            {
-                if (NetworkManager.Singleton.IsServer == true)
-                {
-                    NetworkObject netObj = newMask.GetComponent<NetworkObject>();
-                    
-                    if (netObj != null)
-                    {
-                        if (netObj.IsSpawned == false)
-                        {
-                            netObj.Spawn();
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("[MaskSpawnerServerAuthoritative] MaskToSpawn has no NetworkObject; it will only exist on the server.");
-                    }
-                }
-            }
-        }
-
-        DoSpawnEffect(position, rot);
-        
         hasSpawned = true;
-        
-        Debug.Log("Mask spawned at position: " + position.ToString());
+        Debug.Log($"Mask spawned at position: {position}");
     }
 
-    private void DoSpawnEffect(Vector3 position, Quaternion rotation)
+    private Vector3 DetermineSpawnPosition(Vector3 enemyPosition)
     {
-        if (spawnEffectPrefab == null)
-        {
-            return;
-        }
-
-        GameObject effectObj = Instantiate(spawnEffectPrefab, position, rotation);
-
-        if (NetworkManager.Singleton != null)
-        {
-            if (NetworkManager.Singleton.IsListening == true)
-            {
-                if (NetworkManager.Singleton.IsServer == true)
-                {
-                    NetworkObject netObj = effectObj.GetComponent<NetworkObject>();
-                    
-                    if (netObj != null)
-                    {
-                        if (netObj.IsSpawned == false)
-                        {
-                            netObj.Spawn();
-                        }
-                    }
-                }
-            }
-        }
-
-        Destroy(effectObj, 2.0f);
-    }
-
-    private Vector3 GetSpawnPosition(Vector3 enemyPos)
-    {
-        Vector3 result;
+        Vector3 spawnPosition;
 
         if (customSpawnLocation != null)
         {
-            result = customSpawnLocation.position;
+            // Use custom spawn location if specified
+            spawnPosition = customSpawnLocation.position;
+        }
+        else if (spawnAtEnemyPosition)
+        {
+            // Spawn at enemy position with offset
+            spawnPosition = enemyPosition + spawnOffset;
         }
         else
         {
-            if (spawnAtEnemyPosition == true)
-            {
-                result = enemyPos + spawnOffset;
-            }
-            else
-            {
-                result = transform.position + spawnOffset;
-            }
+            // Spawn at this spawner's position
+            spawnPosition = transform.position + spawnOffset;
         }
 
-        return result;
+        return spawnPosition;
     }
 }
