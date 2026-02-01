@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Netcode;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -14,17 +15,38 @@ public class EnemyController : RadialPower
     private Vector3 startPosition;
     private Vector3 targetPosition;
     private bool movingToTarget = true;
+    private Coroutine fireRoutine;
 
-    void Start()
+    private void Start()
     {
         startPosition = transform.position;
         CalculateTargetPosition();
-        StartCoroutine(FireProjectiles());
+
+       StartCoroutine(BeginFiringWhenNetworkReady());
     }
 
     void Update()
     {
         MoveEnemy();
+    }
+
+    private IEnumerator BeginFiringWhenNetworkReady()
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null)
+        {
+            fireRoutine = StartCoroutine(FireProjectiles());
+            yield break;
+        }
+
+        yield return new WaitUntil(() => NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening);
+
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            yield break;
+        }
+
+        fireRoutine = StartCoroutine(FireProjectiles());
     }
 
     private void CalculateTargetPosition()
