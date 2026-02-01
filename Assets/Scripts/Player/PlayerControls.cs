@@ -62,15 +62,53 @@ public class PlayerControls : NetworkBehaviour
                 animator.SetTrigger("Attack");
             }
 
-            if (currentMask != null)
-            {
-                MaskController maskController = currentMask.GetComponent<MaskController>();
-                if (maskController != null)
-                {
-                    maskController.UsePower();
-                }
-            }
+            TryUseEquippedPower();
         }
+    }
+
+    private void TryUseEquippedPower()
+    {
+        if (currentMask == null) return;
+
+        var maskController = currentMask.GetComponent<MaskController>();
+        if (maskController == null) return;
+
+        // Offline / singleplayer: run locally.
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        {
+            maskController.UsePower();
+            return;
+        }
+
+        // Online: the server should execute the power so spawned projectiles can be network-spawned.
+        if (IsServer)
+        {
+            maskController.UsePower();
+        }
+        else if (IsOwner)
+        {
+            UseMaskPowerServerRpc();
+        }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void UseMaskPowerServerRpc()
+    {
+        if (currentMask == null) return;
+
+        var maskController = currentMask.GetComponent<MaskController>();
+        if (maskController == null) return;
+
+        maskController.UsePower();
+    }
+
+    public void EquipMaskServerOnly(GameObject maskPrefab)
+    {
+        if (!IsServer) return;
+        if (maskPrefab == null) return;
+
+        var newMask = Instantiate(maskPrefab);
+        EquipMask(newMask);
     }
 
     public void EquipMask(GameObject newMask)

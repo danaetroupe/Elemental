@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Netcode;
 
 public class HealthController : MonoBehaviour
 {
@@ -22,6 +23,14 @@ public class HealthController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        // In multiplayer, only the server mutates health/state.
+        if (NetworkManager.Singleton != null &&
+            NetworkManager.Singleton.IsListening &&
+            !NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
+
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0);
 
@@ -44,6 +53,17 @@ public class HealthController : MonoBehaviour
     private void Die()
     {
         OnDeath?.Invoke(gameObject.transform.position);
+
+        // If this is a network-spawned object, the server despawns it so all clients stay in sync.
+        if (TryGetComponent<NetworkObject>(out var no) && no.IsSpawned)
+        {
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+            {
+                no.Despawn(true);
+            }
+            return;
+        }
+
         Destroy(gameObject);
     }
 
