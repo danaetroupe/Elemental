@@ -346,10 +346,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4817934112841458175}
+      addedObject: {fileID: -1001000}
     - targetCorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -1001000}
+      addedObject: {fileID: 4817934112841458175}
     - targetCorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       insertIndex: -1
       addedObject: {fileID: -1001001}
@@ -359,6 +359,31 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
   m_PrefabInstance: {fileID: 7058828744722984730}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &-1001000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 479301186603045034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2529183572
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &4817934112841458175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,6 +396,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ddb9d16b8bae1a4283dec726fc6b33e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthController
+  ShowTopMostFoldoutHeaderGroup: 1
   starterHealth: 100
   OnDeath:
     m_PersistentCalls:
@@ -390,31 +416,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &-1001000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 479301186603045034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2718281828
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &-1001001
 MonoBehaviour:
   m_ObjectHideFlags: 0
