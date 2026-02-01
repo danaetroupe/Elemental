@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 public class PlayerControls : NetworkBehaviour
 {
@@ -26,11 +27,22 @@ public class PlayerControls : NetworkBehaviour
 
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+    private NetworkAnimator networkAnimator;
+
+    private readonly NetworkVariable<bool> facingRight = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
 
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        networkAnimator = GetComponent<NetworkAnimator>();
+        if (sprite == null)
+        {
+            sprite = GetComponentInChildren<SpriteRenderer>();
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -47,7 +59,14 @@ public class PlayerControls : NetworkBehaviour
 
             if (animator != null)
             {
-                animator.SetTrigger("Dodge");
+                if (networkAnimator != null)
+                {
+                    networkAnimator.SetTrigger("Dodge");
+                }
+                else
+                {
+                    animator.SetTrigger("Dodge");
+                }
             }
         }
     }
@@ -59,7 +78,14 @@ public class PlayerControls : NetworkBehaviour
             lastAttackTime = Time.time;
             if (animator != null)
             {
-                animator.SetTrigger("Attack");
+                if (networkAnimator != null)
+                {
+                    networkAnimator.SetTrigger("Attack");
+                }
+                else
+                {
+                    animator.SetTrigger("Attack");
+                }
             }
 
             TryUseEquippedPower();
@@ -232,9 +258,14 @@ public class PlayerControls : NetworkBehaviour
         animator.SetFloat("isMovingX", Mathf.Abs(moveInput.x));
         animator.SetFloat("isMovingY", Mathf.Abs(moveInput.y));
         
-        if(moveInput.x != 0)
+        if (moveInput.x != 0)
         {
-            sprite.flipX = moveInput.x > 0;
+            bool shouldFaceRight = moveInput.x > 0;
+            ApplySpriteFlip(shouldFaceRight);
+            if (IsOwner && IsSpawned && facingRight.Value != shouldFaceRight)
+            {
+                facingRight.Value = shouldFaceRight;
+            }
         }
     }
 
@@ -273,5 +304,35 @@ public class PlayerControls : NetworkBehaviour
 
         if (cameraRig != null)
             cameraRig.SetActive(IsOwner);
+
+        facingRight.OnValueChanged += HandleFacingChanged;
+        if (IsOwner && sprite != null)
+        {
+            facingRight.Value = sprite.flipX;
+        }
+        else
+        {
+            ApplySpriteFlip(facingRight.Value);
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        facingRight.OnValueChanged -= HandleFacingChanged;
+    }
+
+    private void HandleFacingChanged(bool previousValue, bool newValue)
+    {
+        ApplySpriteFlip(newValue);
+    }
+
+    private void ApplySpriteFlip(bool faceRight)
+    {
+        if (sprite == null)
+        {
+            return;
+        }
+
+        sprite.flipX = faceRight;
     }
 }
