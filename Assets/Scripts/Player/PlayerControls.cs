@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using UnityEngine.Events;
 
 public class PlayerControls : NetworkBehaviour
 {
@@ -15,6 +16,7 @@ public class PlayerControls : NetworkBehaviour
     
 
     [SerializeField] private SpriteRenderer sprite;
+    [SerializeField] private UnityEvent<List<GameObject>, GameObject> OnMaskChanged;
 
     private Vector2 moveInput;
     private float lastDodgeTime = -1f;
@@ -34,7 +36,7 @@ public class PlayerControls : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
 
-
+    
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -174,7 +176,7 @@ public class PlayerControls : NetworkBehaviour
         }
 
         SwapCharacter();
-
+        OnMaskChanged?.Invoke(maskInventory, currentMask);
         Debug.Log($"Equipped mask: {newMask.name}");
     }
 

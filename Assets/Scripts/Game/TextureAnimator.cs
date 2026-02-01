@@ -25,4 +25,9 @@ public class TextureAnimator : MonoBehaviour
             timer = 0f;
         }
     }
+
+    public Texture2D[] GetTextures()
+    {
+        return textures;
+    }
 }
