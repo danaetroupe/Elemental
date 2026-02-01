@@ -372,10 +372,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6297014202364505687}
+      addedObject: {fileID: 7483793670705600366}
     - targetCorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7483793670705600366}
+      addedObject: {fileID: 6297014202364505687}
     - targetCorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2233437013852959423}
@@ -396,37 +396,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7445345993230548912, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
   m_PrefabInstance: {fileID: 3471086194253504012}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6297014202364505687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6303043019098317244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ddb9d16b8bae1a4283dec726fc6b33e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthController
-  starterHealth: 100
-  OnDeath:
-    m_PersistentCalls:
-      m_Calls: []
-  OnHealthChanged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4262812215192339162}
-        m_TargetAssemblyTypeName: HealthBarUIController, Assembly-CSharp
-        m_MethodName: UpdateHealthBar
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &7483793670705600366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,6 +421,38 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &6297014202364505687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6303043019098317244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ddb9d16b8bae1a4283dec726fc6b33e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthController
+  ShowTopMostFoldoutHeaderGroup: 1
+  starterHealth: 100
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4262812215192339162}
+        m_TargetAssemblyTypeName: HealthBarUIController, Assembly-CSharp
+        m_MethodName: UpdateHealthBar
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2233437013852959423
 MonoBehaviour:
   m_ObjectHideFlags: 0
