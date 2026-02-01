@@ -148,6 +148,7 @@ public class PlayerControls : NetworkBehaviour
     {
         if (!IsOwner) return; 
             HandleMovement();
+            Debug.Log("Movement");
     }
 
     private void HandleMovement()
@@ -179,6 +180,10 @@ public class PlayerControls : NetworkBehaviour
     }
     public override void OnNetworkSpawn()
     {
+        var playerInput = GetComponent<PlayerInput>();
+        if (playerInput != null)
+            playerInput.enabled = IsOwner;
+
         if (cameraRig != null)
             cameraRig.SetActive(IsOwner);
     }
