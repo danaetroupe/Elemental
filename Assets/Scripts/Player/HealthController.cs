@@ -9,8 +9,8 @@ public class HealthController : MonoBehaviour
     [SerializeField] private int starterHealth = 100;
 
     [Header("Events")]
-    [SerializeField] private UnityEvent OnDeath;
-    [SerializeField] private UnityEvent<int, int> OnHealthChanged;
+    public UnityEvent<Vector3> OnDeath;
+    public UnityEvent<int, int> OnHealthChanged;
 
     private int currentHealth;
 
@@ -44,7 +44,7 @@ public class HealthController : MonoBehaviour
 
     private void Die()
     {
-        OnDeath?.Invoke();
+        OnDeath?.Invoke(gameObject.transform.position);
         Destroy(gameObject);
     }
 

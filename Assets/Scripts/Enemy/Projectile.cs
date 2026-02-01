@@ -27,8 +27,7 @@ public class Projectile : MonoBehaviour
         }
         else if (other.CompareTag("Player"))
         {
-            HealthController playerHealth = other.GetComponent<HealthController>();
-            if (playerHealth != null)
+            if (other.TryGetComponent<HealthController>(out var playerHealth))
             {
                 playerHealth.TakeDamage(damage);
             }
