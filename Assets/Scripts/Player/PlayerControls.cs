@@ -125,7 +125,7 @@ public class PlayerControls : NetworkBehaviour
         }
         else
         {
-            maskController.DestroySprite();
+            maskController.HideSprite();
         }
 
         if (currentMask != null)

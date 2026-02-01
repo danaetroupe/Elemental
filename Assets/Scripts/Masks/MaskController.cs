@@ -8,9 +8,6 @@ public class MaskController : MonoBehaviour
     [Header("Power")]
     [SerializeField] private Power power;
 
-    [Header("Components")]
-    private SpriteRenderer spriteRenderer;
-
     [Header("Visual Effects")]
     [SerializeField] private float rotationSpeed = 50f;
     [SerializeField] private float bobSpeed = 2f;
@@ -34,11 +31,11 @@ public class MaskController : MonoBehaviour
         transform.position = new Vector3(transform.position.x, newY, transform.position.z);
     }
 
-    public void DestroySprite()
+    public void HideSprite()
     {
-        if (spriteRenderer != null)
+        if (gameObject.TryGetComponent<MeshRenderer>(out MeshRenderer meshRenderer))
         {
-            spriteRenderer.enabled = false;
+            meshRenderer.enabled = false;
         }
 
         isSpawned = false;
