@@ -148,7 +148,6 @@ public class PlayerControls : NetworkBehaviour
     {
         if (!IsOwner) return; 
             HandleMovement();
-            Debug.Log("Movement");
     }
 
     private void HandleMovement()
