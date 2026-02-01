@@ -18,6 +18,10 @@ public class Projectile : MonoBehaviour
     void Update()
     {
         transform.position += direction * speed * Time.deltaTime;
+        if (transform.position.y <= 0f)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
