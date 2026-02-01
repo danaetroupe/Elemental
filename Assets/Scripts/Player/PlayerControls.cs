@@ -63,9 +63,9 @@ public class PlayerControls : MonoBehaviour
             if (currentMask != null)
             {
                 MaskController maskController = currentMask.GetComponent<MaskController>();
-                if (maskController != null && maskController.power != null)
+                if (maskController != null)
                 {
-                    maskController.power.UsePower();
+                    maskController.UsePower();
                 }
             }
         }
@@ -120,7 +120,7 @@ public class PlayerControls : MonoBehaviour
             return;
         }
 
-        Sprite characterSprite = maskController.characterSprite;
+        Sprite characterSprite = maskController.GetSprite();
 
         if (characterSprite != null && spriteRenderer != null)
         {

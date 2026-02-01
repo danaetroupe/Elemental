@@ -113,4 +113,14 @@ public class MaskController : MonoBehaviour
         power = newPower;
         Debug.Log($"Power set to: {(newPower != null ? newPower.GetType().Name : "None")}");
     }
+
+    public Sprite GetSprite()
+    {
+        return maskSprite;
+    }
+
+    public void UsePower()
+    {
+        power.UsePower();
+    }
 }
