@@ -12,6 +12,7 @@ public class EnemyController : RadialPower
 
     [SerializeField] private float timeBetweenFire = 2f;
 
+    [SerializeField] private Animator animator;
     private Vector3 startPosition;
     private Vector3 targetPosition;
     private bool movingToTarget = true;
@@ -68,7 +69,19 @@ public class EnemyController : RadialPower
     private void MoveEnemy()
     {
         Vector3 destination = movingToTarget ? targetPosition : startPosition;
+        Vector3 direction = (destination - transform.position).normalized;
         transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
+
+        bool horizontal = Mathf.Abs(direction.x) >= Mathf.Abs(direction.z);
+
+        animator.SetBool("WalkRight", horizontal);
+        animator.SetBool("WalkUp", !horizontal);
+
+        var sr = GetComponent<SpriteRenderer>();
+        if (horizontal)
+        {
+            sr.flipX = direction.x < 0f;
+        }
 
         if (Vector3.Distance(transform.position, destination) < 0.01f)
         {
