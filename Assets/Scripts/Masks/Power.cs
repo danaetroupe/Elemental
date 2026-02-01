@@ -32,7 +32,8 @@ public abstract class Power : MonoBehaviour
         if (projectilePrefab != null)
         {
             // Use the projectile prefab if assigned
-            projectile = Instantiate(projectilePrefab, origin, Quaternion.identity);
+            // Preserve the prefab's authored rotation (Quaternion.identity would override it)
+            projectile = Instantiate(projectilePrefab, origin, projectilePrefab.transform.rotation);
         }
         else
         {
