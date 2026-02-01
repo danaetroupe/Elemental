@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8899024070491901420
+--- !u!1 &1905295682985610125
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,41 +8,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7264171360299730683}
-  - component: {fileID: 7546645792324280267}
-  - component: {fileID: 6436452963885667985}
-  - component: {fileID: 6769904797162755577}
-  - component: {fileID: 3024970665525206971}
-  - component: {fileID: 6335784243577686954}
+  - component: {fileID: 7090511164963282696}
+  - component: {fileID: 4808787730289076239}
+  - component: {fileID: 2765505269412396088}
+  - component: {fileID: 4945838295195651698}
+  - component: {fileID: 253624004573072324}
+  - component: {fileID: 7369137975516149718}
   m_Layer: 0
-  m_Name: WaterMaskTotem2
+  m_Name: StoneMaskTotem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7264171360299730683
+--- !u!4 &7090511164963282696
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8899024070491901420}
+  m_GameObject: {fileID: 1905295682985610125}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: -2.132, y: 0.562, z: 0.34002808}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &7546645792324280267
+--- !u!136 &4808787730289076239
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8899024070491901420}
+  m_GameObject: {fileID: 1905295682985610125}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -59,20 +59,20 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &6436452963885667985
+--- !u!114 &2765505269412396088
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8899024070491901420}
+  m_GameObject: {fileID: 1905295682985610125}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3229969445
-  InScenePlacedSourceGlobalObjectIdHash: 4010466413
+  GlobalObjectIdHash: 1478709842
+  InScenePlacedSourceGlobalObjectIdHash: 1752645672
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -84,29 +84,29 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &6769904797162755577
+--- !u!114 &4945838295195651698
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8899024070491901420}
+  m_GameObject: {fileID: 1905295682985610125}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02cb768ab403e4b4b928fcb55f263df4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskPickup
   ShowTopMostFoldoutHeaderGroup: 1
-  pickupTrigger: {fileID: 7546645792324280267}
-  maskPrefab: {fileID: 2611654997512979429, guid: 62cfd340edf93af4b9bd69bc4fa83a57, type: 3}
---- !u!212 &3024970665525206971
+  pickupTrigger: {fileID: 4808787730289076239}
+  maskPrefab: {fileID: 2611654997512979429, guid: ed13d8594fcdbec419abe92f7d04657e, type: 3}
+--- !u!212 &253624004573072324
 SpriteRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8899024070491901420}
+  m_GameObject: {fileID: 1905295682985610125}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -148,7 +148,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 26abb8e0c8ffbf4429c41cbb8ab016d4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e50321aafe7ca8548955ca8abb94dcf9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -158,17 +158,17 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!95 &6335784243577686954
+--- !u!95 &7369137975516149718
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8899024070491901420}
-  m_Enabled: 1
+  m_GameObject: {fileID: 1905295682985610125}
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f12eefea72be64a4d9942e4d0e6b8d56, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

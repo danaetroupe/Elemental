@@ -20,38 +20,34 @@ public class AnimatedPower : Power
             Debug.LogError("MainCanvas not found in scene. Please add a Canvas with the tag 'MainCanvas'.");
         }
     }
-    protected override void DoBehavior()
+    protected override void DoBehavior(Vector3 aimTarget)
     {
-        Vector2 screenPosition = Mouse.current.position.ReadValue();
+       Vector2 screenPosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
 
-        RectTransform canvasRect = mainCanvas.GetComponent<RectTransform>();
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect,
-            screenPosition,
-            mainCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : Camera.main,
-            out Vector2 localPoint
-        );
-
-        GameObject imageObject = new GameObject("ImageProjectile");
-        Image image = imageObject.AddComponent<Image>();
-        image.sprite = frames[0];
-
-        imageObject.transform.SetParent(mainCanvas.transform, false);
-
-        RectTransform rectTransform = imageObject.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = localPoint + animationOffset;
-        rectTransform.localScale = Vector3.one * 3f; // Let's make this bigger!
-
-        StartCoroutine(AnimateFrames(imageObject, image));
-
-        // Spawn invisible "projectile"
-        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (mainCanvas != null)
         {
-            Vector3 worldPosition = hit.point;
-            SpawnProjectile(worldPosition + Vector3.up, Vector3.down);
+            RectTransform canvasRect = mainCanvas.GetComponent<RectTransform>();
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect,
+                screenPosition,
+                mainCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : Camera.main,
+                out Vector2 localPoint
+            );
+
+            GameObject imageObject = new GameObject("ImageProjectile");
+            Image image = imageObject.AddComponent<Image>();
+            image.sprite = frames[0];
+
+            imageObject.transform.SetParent(mainCanvas.transform, false);
+
+            RectTransform rectTransform = imageObject.GetComponent<RectTransform>();
+            rectTransform.anchoredPosition = localPoint + animationOffset;
+            rectTransform.localScale = Vector3.one * 3f;
+
+            StartCoroutine(AnimateFrames(imageObject, image));
         }
+
+        SpawnProjectile(aimTarget + Vector3.up, Vector3.down);
     }
 
     IEnumerator AnimateFrames(GameObject imageObject, Image image)
