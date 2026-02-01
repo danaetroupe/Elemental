@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2022695922495006991, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1307919580
+      value: 2020516218
       objectReference: {fileID: 0}
     - target: {fileID: 145472108501386907, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
       propertyPath: currentMask
