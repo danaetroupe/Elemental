@@ -24,14 +24,14 @@ AnimationClip:
       value: {fileID: 21300000, guid: 75c0da0b1a89b7d4193831ea15494faa, type: 3}
     - time: 0.06666667
       value: {fileID: 21300000, guid: f611404d1ad58134d83728e64c38dade, type: 3}
-    - time: 0.13333334
+    - time: 0.15
       value: {fileID: 21300000, guid: e73ea363792a5234d89ec1e8677cb932, type: 3}
     - time: 0.2
       value: {fileID: 21300000, guid: 23cb382107f3ba549af9c0873745467f, type: 3}
     - time: 0.26666668
       value: {fileID: 21300000, guid: 23cb382107f3ba549af9c0873745467f, type: 3}
     attribute: m_Sprite
-    path: PlayerSprite
+    path: 
     classID: 212
     script: {fileID: 0}
     flags: 2
@@ -43,7 +43,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 533382794
+      path: 0
       attribute: 0
       script: {fileID: 0}
       typeID: 212
