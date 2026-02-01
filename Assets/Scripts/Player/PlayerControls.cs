@@ -13,6 +13,9 @@ public class PlayerControls : NetworkBehaviour
     [SerializeField] float dodgeCooldown = 1f;
     [SerializeField] float attackCooldown = 0.5f;
     
+
+    [SerializeField] private SpriteRenderer sprite;
+
     private Vector2 moveInput;
     private float lastDodgeTime = -1f;
     private float lastAttackTime = -1f;
@@ -144,7 +147,21 @@ public class PlayerControls : NetworkBehaviour
     {
         if (!IsOwner) return; 
             HandleMovement();
+       HandleAnimation();
     }
+    private void HandleAnimation()
+    {
+        animator.SetFloat("moveInputX", moveInput.x);
+        animator.SetFloat("moveInputY", moveInput.y);
+        animator.SetFloat("isMovingX", Mathf.Abs(moveInput.x));
+        animator.SetFloat("isMovingY", Mathf.Abs(moveInput.y));
+        
+        if(moveInput.x != 0)
+        {
+            sprite.flipX = moveInput.x > 0;
+        }
+    }
+
 
     private void HandleMovement()
     {
