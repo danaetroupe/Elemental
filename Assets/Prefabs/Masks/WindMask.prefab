@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskController
   characterColor: {r: 1, g: 1, b: 1, a: 1}
-  power: {fileID: 0}
+  power: {fileID: -401060775949318331}
   rotationSpeed: 50
   bobSpeed: 2
   bobHeight: 0.3
@@ -167,7 +167,19 @@ MonoBehaviour:
   projectileSpeed: 10
   projectilePrefab: {fileID: 5353094571180383623, guid: b907596259270034eb0c8d677b62d52d, type: 3}
   frames:
-  - {fileID: 0}
+  - {fileID: 21300000, guid: ab32bd37a3a9c874bb12cc4035546eb1, type: 3}
+  - {fileID: 21300000, guid: 54541b08c78e7c045b067e8a59b65ea0, type: 3}
+  - {fileID: 21300000, guid: df484d96c5bc3664e8730c2cf36cf094, type: 3}
+  - {fileID: 21300000, guid: 63d0a9f0cece0a8429909b418f08e650, type: 3}
+  - {fileID: 21300000, guid: 062ebeec1edb65a4daf89754e7db2489, type: 3}
+  - {fileID: 21300000, guid: a0733e0697e6d4e41b9f738cd20ab6ce, type: 3}
+  - {fileID: 21300000, guid: d481abb2112b6cd4cb97bdea34a5341d, type: 3}
+  - {fileID: 21300000, guid: 81b3941404ff8a948a659386af9e6547, type: 3}
+  - {fileID: 21300000, guid: 3609683fcf178cc419ffd9c2f5699d09, type: 3}
+  - {fileID: 21300000, guid: 0c6962ee45ff54142b43e65fe5160b6d, type: 3}
+  - {fileID: 21300000, guid: 911d50ed86dd4d44bb39db8a9ded06ca, type: 3}
+  - {fileID: 21300000, guid: 018bc963ad312884eb64d7222269696c, type: 3}
+  - {fileID: 21300000, guid: 53831ae17bdcf154c89ee52c3f8cbe92, type: 3}
   frameRate: 12
   animationOffset: {x: 0, y: 0}
   pushForce: 10
