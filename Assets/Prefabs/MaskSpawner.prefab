@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 525d5fcaecaa8d240b2c4c5478253a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskSpawner
-  maskToSpawn: {fileID: 6372378798552624255}
+  maskToSpawn: {fileID: 3464314528544800817, guid: 90a0e596dc817ba42bfdd985123adec0, type: 3}
   spawnOffset: {x: 0, y: 0.5, z: 0}
   spawnAtEnemyPosition: 1
   customSpawnLocation: {fileID: 0}
