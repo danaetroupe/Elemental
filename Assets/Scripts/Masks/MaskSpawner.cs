@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class MaskSpawner : MonoBehaviour
 {
+    [Header("Enemy References")]
+    [SerializeField] private List<GameObject> enemiesToTrack = new List<GameObject>();
+
     [Header("Mask Settings")]
     public GameObject maskToSpawn;
 
@@ -10,33 +13,49 @@ public class MaskSpawner : MonoBehaviour
     public Vector3 spawnOffset = Vector3.up * 0.5f;
     public bool spawnAtEnemyPosition = true;
     public Transform customSpawnLocation;
-
-    [Header("Effects")]
-    public GameObject spawnEffectPrefab;
     public float spawnDelay = 0.5f;
 
     private bool hasSpawned = false;
+    private int remainingEnemies;
 
     void Start()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject enemy in enemies)
+        // Remove any null references from the list
+        enemiesToTrack.RemoveAll(enemy => enemy == null);
+
+        remainingEnemies = enemiesToTrack.Count;
+
+        if (remainingEnemies == 0)
+        {
+            Debug.LogWarning("No enemies assigned to MaskSpawner!");
+            return;
+        }
+
+        // Subscribe to death events for each enemy in the list
+        foreach (GameObject enemy in enemiesToTrack)
         {
             HealthController healthController = enemy.GetComponent<HealthController>();
             if (healthController != null)
             {
                 healthController.OnDeath.AddListener(OnEnemyDeath);
             }
+            else
+            {
+                Debug.LogWarning($"Enemy '{enemy.name}' does not have a HealthController component!");
+            }
         }
     }
 
     public void OnEnemyDeath(Vector3 enemyPosition)
     {
-        if (GameObject.FindGameObjectsWithTag("Enemy").Length <= 1)
+        remainingEnemies--;
+
+        if (remainingEnemies <= 0)
         {
             OnLastEnemyDeath(enemyPosition);
         }
     }
+
     public void OnLastEnemyDeath(Vector3 enemyPosition)
     {
         if (hasSpawned)
@@ -75,13 +94,6 @@ public class MaskSpawner : MonoBehaviour
     {
         // Instantiate the mask prefab
         GameObject spawnedMask = Instantiate(maskToSpawn, position, Quaternion.Euler(90, 0, 0));
-
-        // Spawn visual effect if assigned
-        if (spawnEffectPrefab != null)
-        {
-            GameObject effect = Instantiate(spawnEffectPrefab, position, Quaternion.Euler(90, 0, 0));
-            Destroy(effect, 2f); // Auto-destroy effect after 2 seconds
-        }
 
         hasSpawned = true;
         Debug.Log($"Mask spawned at position: {position}");
