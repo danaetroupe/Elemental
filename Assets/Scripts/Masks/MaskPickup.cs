@@ -42,7 +42,7 @@ public class MaskPickup : NetworkBehaviour
 
         EquipMaskClientRpc(pickerClientId, rpcParams);
 
-        AttachMaskVisualForAllClientRpc(pickerClientId);
+        // AttachMaskVisualForAllClientRpc(pickerClientId);
 
         var netObj = GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned)
