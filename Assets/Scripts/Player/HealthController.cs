@@ -24,7 +24,6 @@ public class HealthController : MonoBehaviour
     {
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0);
-        Debug.Log(currentHealth);
 
         OnHealthChanged?.Invoke(currentHealth, starterHealth);
 

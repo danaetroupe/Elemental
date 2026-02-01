@@ -49,7 +49,6 @@ public class MaskController : MonoBehaviour
         if (player != null)
         {
             player.EquipMask(gameObject);
-            DestroySprite();
         }
     }
 

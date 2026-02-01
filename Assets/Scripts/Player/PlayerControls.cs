@@ -86,6 +86,10 @@ public class PlayerControls : NetworkBehaviour
             Debug.LogWarning("Mask does not have MaskController component!");
             return;
         }
+        else
+        {
+            maskController.DestroySprite();
+        }
 
         if (currentMask != null)
         {
@@ -160,6 +164,7 @@ public class PlayerControls : NetworkBehaviour
         {
             sprite.flipX = moveInput.x > 0;
         }
+            Debug.Log("Movement");
     }
 
 
