@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
@@ -22,6 +21,8 @@ public class PlayerControls : NetworkBehaviour
 
     private GameObject currentMask;
     private List<GameObject> maskInventory = new List<GameObject>();
+
+    private GameObject maskVisualInstance;
 
     private SpriteRenderer spriteRenderer;
     private Animator animator;
@@ -100,7 +101,10 @@ public class PlayerControls : NetworkBehaviour
         }
 
         currentMask = newMask;
-        currentMask.transform.parent = gameObject.transform;
+
+        currentMask.transform.SetParent(transform);
+        currentMask.transform.localPosition = Vector3.zero;
+        currentMask.transform.localRotation = Quaternion.identity;
 
         if (!maskInventory.Contains(newMask))
         {
@@ -110,6 +114,35 @@ public class PlayerControls : NetworkBehaviour
         SwapCharacter();
 
         Debug.Log($"Equipped mask: {newMask.name}");
+    }
+
+
+    public void AttachMaskVisual(GameObject maskPrefab)
+    {
+        if (maskPrefab == null) return;
+
+
+        if (IsOwner) return;
+
+        if (maskVisualInstance != null)
+        {
+            Destroy(maskVisualInstance);
+            maskVisualInstance = null;
+        }
+
+        maskVisualInstance = Instantiate(maskPrefab);
+        maskVisualInstance.transform.SetParent(transform);
+        maskVisualInstance.transform.localPosition = Vector3.zero;
+        maskVisualInstance.transform.localRotation = Quaternion.identity;
+
+        foreach (var col in maskVisualInstance.GetComponentsInChildren<Collider>(true))
+            col.enabled = false;
+
+        foreach (var rb in maskVisualInstance.GetComponentsInChildren<Rigidbody>(true))
+        {
+            rb.isKinematic = true;
+            rb.detectCollisions = false;
+        }
     }
     public void SwapCharacter()
     {
@@ -150,8 +183,9 @@ public class PlayerControls : NetworkBehaviour
     void FixedUpdate()
     {
         if (!IsOwner) return; 
-            HandleMovement();
-       HandleAnimation();
+
+        HandleMovement();
+        HandleAnimation();
     }
     private void HandleAnimation()
     {

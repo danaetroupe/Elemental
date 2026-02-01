@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 public abstract class Power : MonoBehaviour
 {
@@ -41,9 +42,7 @@ public abstract class Power : MonoBehaviour
 
         if (projectilePrefab != null)
         {
-            // Use the projectile prefab if assigned
-            // Preserve the prefab's authored rotation (Quaternion.identity would override it)
-            projectile = Instantiate(projectilePrefab, origin, projectilePrefab.transform.rotation);
+            projectile = Instantiate(projectilePrefab, origin, Quaternion.identity);
         }
         else
         {
@@ -59,6 +58,15 @@ public abstract class Power : MonoBehaviour
 
         // Initialize the projectile
         projectileScript.Initialize(direction.normalized, projectileSpeed);
+
+
+        if (NetworkManager.Singleton != null &&
+            NetworkManager.Singleton.IsServer &&
+            projectile.TryGetComponent<NetworkObject>(out var netObj) &&
+            !netObj.IsSpawned)
+        {
+            netObj.Spawn();
+        }
 
         return projectile;
     }

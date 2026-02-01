@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class Projectile : MonoBehaviour
 {
@@ -14,8 +15,21 @@ public class Projectile : MonoBehaviour
     [SerializeField] float spinDegreesPerSecond = 360f;   // set in prefab
     [SerializeField] Vector3 spinAxis = Vector3.forward;  // pick axis that looks right
 
+    private bool IsNetworkSpawned()
+    {
+        return TryGetComponent<NetworkObject>(out var no) && no.IsSpawned;
+    }
+
+    private bool IsServerAuthoritative()
+    {
+        return NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer;
+    }
+
     private void OnEnable()
     {
+        // For network-spawned projectiles, only the server controls lifetime.
+        if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
+
         // Ensure projectiles don't live forever if they miss everything.
         if (lifetimeSeconds > 0f)
         {
@@ -31,6 +45,15 @@ public class Projectile : MonoBehaviour
 
     private void Despawn()
     {
+        if (TryGetComponent<NetworkObject>(out var no) && no.IsSpawned)
+        {
+            if (IsServerAuthoritative())
+            {
+                no.Despawn(true);
+            }
+            return;
+        }
+
         Destroy(gameObject);
     }
 
@@ -44,6 +67,9 @@ public class Projectile : MonoBehaviour
 
     void Update()
     {
+        // If this projectile is network-spawned, only the server simulates it.
+        if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
+
         transform.position += direction * speed * Time.deltaTime;
         transform.Rotate(spinAxis, spinDegreesPerSecond * Time.deltaTime, Space.Self);
 
@@ -56,9 +82,12 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // If this projectile is network-spawned, only the server applies hits/despawns.
+        if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
+
         if (other.CompareTag("Wall"))
         {
-            Destroy(gameObject);
+            Despawn();
         }
         else if (!isPlayerProjectile && other.CompareTag("Player"))
         {
@@ -66,7 +95,7 @@ public class Projectile : MonoBehaviour
             {
                 playerHealth.TakeDamage(damage);
             }
-            Destroy(gameObject);
+            Despawn();
         }
         else if(isPlayerProjectile && other.CompareTag("Enemy"))
         {
@@ -74,7 +103,7 @@ public class Projectile : MonoBehaviour
             {
                 enemyHealth.TakeDamage(damage);
             }
-            Destroy(gameObject);
+            Despawn();
         }
     }
 }

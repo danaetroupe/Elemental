@@ -27,17 +27,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 111741526722561428}
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -3.9205098}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1975323083715745148}
   m_Father: {fileID: 8288154308670819805}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -11.97, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &8315778356859807302
@@ -288,7 +288,7 @@ PrefabInstance:
     - target: {fileID: 933714706200387867, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       propertyPath: projectilePrefab
       value: 
-      objectReference: {fileID: 795956235146185913, guid: 57e89d0931779d14786f5f17f11e31bb, type: 3}
+      objectReference: {fileID: 795956235146185913, guid: 5ee62c7e767ce824c9fb5098d006813a, type: 3}
     - target: {fileID: 1364748151070991047, guid: 3d77d74048cd915489d7b58dea4132aa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.97

@@ -40,6 +40,8 @@ public class MaskPickup : NetworkBehaviour
 
         EquipMaskClientRpc(pickerClientId, rpcParams);
 
+        AttachMaskVisualForAllClientRpc(pickerClientId);
+
         var netObj = GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned)
         {
@@ -49,6 +51,57 @@ public class MaskPickup : NetworkBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    [ClientRpc]
+    private void AttachMaskVisualForAllClientRpc(ulong pickerClientId)
+    {
+
+        if (maskPrefab == null)
+        {
+            Debug.LogError("[MaskPickup] maskPrefab is not assigned on the pickup.");
+            return;
+        }
+
+        StartCoroutine(AttachMaskVisualWhenPlayerReady(pickerClientId));
+    }
+
+    private System.Collections.IEnumerator AttachMaskVisualWhenPlayerReady(ulong pickerClientId)
+    {
+        if (NetworkManager.Singleton == null) yield break;
+
+        const float timeoutSeconds = 3f;
+        float endTime = Time.time + timeoutSeconds;
+
+        PlayerControls targetPlayer = null;
+        while (targetPlayer == null && Time.time < endTime)
+        {
+            var nm = NetworkManager.Singleton;
+            if (nm == null) yield break;
+
+            foreach (var no in nm.SpawnManager.SpawnedObjectsList)
+            {
+                if (no == null) continue;
+                if (no.OwnerClientId != pickerClientId) continue;
+
+                if (no.TryGetComponent<PlayerControls>(out var pc))
+                {
+                    targetPlayer = pc;
+                    break;
+                }
+            }
+
+            if (targetPlayer == null)
+                yield return null;
+        }
+
+        if (targetPlayer == null)
+        {
+            Debug.LogWarning($"[MaskPickup] Could not find PlayerControls for clientId={pickerClientId} to attach visual mask.");
+            yield break;
+        }
+
+        targetPlayer.AttachMaskVisual(maskPrefab);
     }
 
     [ClientRpc]
