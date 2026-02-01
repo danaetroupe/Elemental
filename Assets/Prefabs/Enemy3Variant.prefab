@@ -412,7 +412,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2159955782
+  GlobalObjectIdHash: 3094187680
   InScenePlacedSourceGlobalObjectIdHash: 2529183572
   DeferredDespawnTick: 0
   Ownership: 1
@@ -439,6 +439,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealthController
   ShowTopMostFoldoutHeaderGroup: 1
   starterHealth: 100
+  deathSound: {fileID: 8300000, guid: afec133b69d58404f81b44a08111eeab, type: 3}
+  deathSoundVolume: 1
+  respawnSound: {fileID: 0}
+  respawnSoundVolume: 1
   OnDeath:
     m_PersistentCalls:
       m_Calls: []

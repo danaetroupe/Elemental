@@ -12,6 +12,8 @@ public class HealthController : NetworkBehaviour
     [Header("Audio")]
     [SerializeField] private AudioClip deathSound;
     [SerializeField] private float deathSoundVolume = 1f;
+    [SerializeField] private AudioClip respawnSound;
+    [SerializeField] private float respawnSoundVolume = 1f;
 
     [Header("Events")]
     public UnityEvent<Vector3> OnDeath;
@@ -165,6 +167,9 @@ public class HealthController : NetworkBehaviour
         {
             if (!NetworkManager.Singleton.IsServer) return;
 
+            // Play respawn sound for all clients
+            PlayRespawnSound();
+
             // Reset health (server-authoritative via NetworkVariable)
             networkHealth.Value = starterHealth;
             
@@ -175,9 +180,37 @@ public class HealthController : NetworkBehaviour
         else
         {
             // Offline mode
+            PlayRespawnSoundLocal();
             currentHealth = starterHealth;
             transform.position = spawnPosition;
             OnHealthChanged?.Invoke(currentHealth, starterHealth);
+        }
+    }
+
+    private void PlayRespawnSound()
+    {
+        if (respawnSound == null) return;
+
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && IsSpawned)
+        {
+            PlayRespawnSoundClientRpc();
+        }
+    }
+
+    private void PlayRespawnSoundLocal()
+    {
+        if (respawnSound != null)
+        {
+            AudioSource.PlayClipAtPoint(respawnSound, transform.position, respawnSoundVolume);
+        }
+    }
+
+    [ClientRpc]
+    private void PlayRespawnSoundClientRpc()
+    {
+        if (respawnSound != null)
+        {
+            AudioSource.PlayClipAtPoint(respawnSound, transform.position, respawnSoundVolume);
         }
     }
 
