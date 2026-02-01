@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: -2022695922495006991}
   - component: {fileID: 145472108501386907}
   - component: {fileID: 1006597327253485581}
-  - component: {fileID: 3488247121479365665}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -33,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 2633738462271900987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -275,8 +274,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerControls
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
-  cameraRig: {fileID: 5558967992098354883}
-  meshRenderer: {fileID: 7327872148743040000}
+  cameraRig: {fileID: 0}
+  dodgeCooldown: 1
+  attackCooldown: 0.5
 --- !u!114 &1006597327253485581
 MonoBehaviour:
   m_ObjectHideFlags: 0

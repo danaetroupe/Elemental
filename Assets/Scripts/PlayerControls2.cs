@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 
-public class PlayerControls : NetworkBehaviour
+public class PlayerControls2 : NetworkBehaviour
 {
     [SerializeField] float moveSpeed = 5f;
     [SerializeField] private GameObject cameraRig;
