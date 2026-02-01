@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
     private Vector3 direction;
     private float speed;
     [SerializeField] private int damage = 10;
+    [SerializeField] private bool isPlayerProjectile = true;
 
     public void Initialize(Vector3 dir, float spd)
     {
@@ -25,11 +26,19 @@ public class Projectile : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        else if (other.CompareTag("Player"))
+        else if (!isPlayerProjectile && other.CompareTag("Player"))
         {
             if (other.TryGetComponent<HealthController>(out var playerHealth))
             {
                 playerHealth.TakeDamage(damage);
+            }
+            Destroy(gameObject);
+        }
+        else if(isPlayerProjectile && other.CompareTag("Enemy"))
+        {
+            if (other.TryGetComponent<HealthController>(out var enemyHealth))
+            {
+                enemyHealth.TakeDamage(damage);
             }
             Destroy(gameObject);
         }

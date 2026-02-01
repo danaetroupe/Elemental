@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8187511930278105562}
   - component: {fileID: 710780769558369227}
   m_Layer: 0
-  m_Name: PebbleProjecile
+  m_Name: WaterProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,7 +70,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99b604c53fe1345498d33fb21cdcc00d, type: 2}
+  - {fileID: 2100000, guid: 4a1b9415f6ad74b4e8fa867f9166ba9e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -128,8 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0c1c4085b183dd44877c07ee36ca27d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  damage: 1
-  isPlayerProjectile: 0
+  damage: 100
 --- !u!65 &8187511930278105562
 BoxCollider:
   m_ObjectHideFlags: 0

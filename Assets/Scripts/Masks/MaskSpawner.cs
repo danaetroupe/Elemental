@@ -76,13 +76,6 @@ public class MaskSpawner : MonoBehaviour
         // Instantiate the mask prefab
         GameObject spawnedMask = Instantiate(maskToSpawn, position, Quaternion.identity);
 
-        // Get the MaskController and call its Spawn method if it exists
-        MaskController maskController = spawnedMask.GetComponent<MaskController>();
-        if (maskController != null)
-        {
-            maskController.Spawn(position);
-        }
-
         // Spawn visual effect if assigned
         if (spawnEffectPrefab != null)
         {

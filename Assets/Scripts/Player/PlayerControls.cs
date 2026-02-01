@@ -15,7 +15,7 @@ public class PlayerControls : MonoBehaviour
     private float lastDodgeTime = -1f;
     private float lastAttackTime = -1f;
 
-    public GameObject currentMask;
+    private GameObject currentMask;
     private List<GameObject> maskInventory = new List<GameObject>();
 
     private SpriteRenderer spriteRenderer;
@@ -23,15 +23,9 @@ public class PlayerControls : MonoBehaviour
 
     private void Awake()
     {
-        // Get or add required components
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
-        {
-            spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
-        }
-
         animator = GetComponent<Animator>();
     }
+
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
@@ -95,6 +89,7 @@ public class PlayerControls : MonoBehaviour
         }
 
         currentMask = newMask;
+        currentMask.transform.parent = gameObject.transform;
 
         if (!maskInventory.Contains(newMask))
         {
@@ -120,17 +115,7 @@ public class PlayerControls : MonoBehaviour
             return;
         }
 
-        Sprite characterSprite = maskController.GetSprite();
-
-        if (characterSprite != null && spriteRenderer != null)
-        {
-            spriteRenderer.sprite = characterSprite;
-            Debug.Log($"Swapped to character sprite: {characterSprite.name}");
-        }
-        else
-        {
-            Debug.LogWarning("Character sprite or SpriteRenderer is null!");
-        }
+        // TODO: Change character appearance based on maskController.characterColor
     }
 
     public void AddMaskToInventory(GameObject mask)
