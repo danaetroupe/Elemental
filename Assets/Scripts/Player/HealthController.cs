@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
 
-public class HealthController : MonoBehaviour
+public class HealthController : NetworkBehaviour
 {
     [Header("Health Settings")]
     [SerializeField] private int starterHealth = 100;
@@ -14,27 +14,67 @@ public class HealthController : MonoBehaviour
     public UnityEvent<int, int> OnHealthChanged;
 
     private int currentHealth;
+    private readonly NetworkVariable<int> networkHealth = new NetworkVariable<int>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
 
-    void Start()
+    private bool UseNetworkedHealth()
     {
-        currentHealth = starterHealth;
-        OnHealthChanged?.Invoke(currentHealth, starterHealth);
+        return NetworkManager.Singleton != null && IsSpawned;
+    }
+
+    private void Start()
+    {
+        if (!UseNetworkedHealth())
+        {
+            currentHealth = starterHealth;
+            OnHealthChanged?.Invoke(currentHealth, starterHealth);
+        }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        networkHealth.OnValueChanged += HandleNetworkHealthChanged;
+
+        if (IsServer)
+        {
+            networkHealth.Value = starterHealth;
+        }
+
+        OnHealthChanged?.Invoke(networkHealth.Value, starterHealth);
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        networkHealth.OnValueChanged -= HandleNetworkHealthChanged;
+    }
+
+    private void HandleNetworkHealthChanged(int previousValue, int newValue)
+    {
+        OnHealthChanged?.Invoke(newValue, starterHealth);
     }
 
     public void TakeDamage(int damage)
     {
-        if (NetworkManager.Singleton != null &&
-            NetworkManager.Singleton.IsListening &&
-            !NetworkManager.Singleton.IsServer)
+        if (UseNetworkedHealth())
         {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
+            networkHealth.Value = Mathf.Max(networkHealth.Value - damage, 0);
+            if (networkHealth.Value <= 0)
+            {
+                Die();
+            }
+
             return;
         }
 
-        currentHealth -= damage;
-        currentHealth = Mathf.Max(currentHealth, 0);
-
+        currentHealth = Mathf.Max(currentHealth - damage, 0);
         OnHealthChanged?.Invoke(currentHealth, starterHealth);
-
         if (currentHealth <= 0)
         {
             Die();
@@ -43,9 +83,18 @@ public class HealthController : MonoBehaviour
 
     public void Heal(int amount)
     {
-        currentHealth += amount;
-        currentHealth = Mathf.Min(currentHealth, starterHealth);
+        if (UseNetworkedHealth())
+        {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
 
+            networkHealth.Value = Mathf.Min(networkHealth.Value + amount, starterHealth);
+            return;
+        }
+
+        currentHealth = Mathf.Min(currentHealth + amount, starterHealth);
         OnHealthChanged?.Invoke(currentHealth, starterHealth);
     }
 
@@ -67,7 +116,7 @@ public class HealthController : MonoBehaviour
 
     public int GetCurrentHealth()
     {
-        return currentHealth;
+        return UseNetworkedHealth() ? networkHealth.Value : currentHealth;
     }
 
     public int GetMaxHealth()

@@ -80,6 +80,13 @@ public class Projectile : MonoBehaviour
     {
         if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
 
+        if (other.TryGetComponent<Projectile>(out _))
+        {
+            return;
+        }
+
+        Debug.Log($"Projectile hit: {other.name} (tag: {other.tag}), isPlayerProjectile={isPlayerProjectile}", this);
+
         if (other.CompareTag("Wall"))
         {
             Despawn();
