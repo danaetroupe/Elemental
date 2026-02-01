@@ -155,6 +155,8 @@ public class PlayerControls : NetworkBehaviour
     }
     private void HandleAnimation()
     {
+        if (!animator)
+            return;
         animator.SetFloat("moveInputX", moveInput.x);
         animator.SetFloat("moveInputY", moveInput.y);
         animator.SetFloat("isMovingX", Mathf.Abs(moveInput.x));
