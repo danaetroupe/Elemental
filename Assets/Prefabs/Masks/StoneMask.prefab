@@ -147,5 +147,7 @@ MonoBehaviour:
   cooldownTime: 2
   projectileSpeed: 12
   projectilePrefab: {fileID: 3960602565624122793, guid: a675ccd75262eb245a52a8faa26f9668, type: 3}
+  attackSound: {fileID: 8300000, guid: b38aae9392c83264285570410ee962e6, type: 3}
+  attackSoundVolume: 1
   offset: {x: 0, y: 10, z: 0}
   direction: {x: 0, y: -1, z: 0}

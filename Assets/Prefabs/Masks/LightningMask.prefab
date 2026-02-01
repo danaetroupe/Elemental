@@ -169,6 +169,8 @@ MonoBehaviour:
   cooldownTime: 1
   projectileSpeed: 20
   projectilePrefab: {fileID: 5353094571180383623, guid: b907596259270034eb0c8d677b62d52d, type: 3}
+  attackSound: {fileID: 8300000, guid: ea4d2d75c325f5441a945fe85277bc4c, type: 3}
+  attackSoundVolume: 1
   frames:
   - {fileID: 21300000, guid: 190f02698498e1e42997e4c06a83f356, type: 3}
   - {fileID: 21300000, guid: 2ed84e6d8f5c02949a22c4ad23ce8edb, type: 3}

@@ -11,6 +11,10 @@ public abstract class Power : MonoBehaviour
     [SerializeField] float projectileSpeed = 10f;
     [SerializeField] GameObject projectilePrefab;
 
+    [Header("Audio")]
+    [SerializeField] protected AudioClip attackSound;
+    [SerializeField] protected float attackSoundVolume = 1f;
+
     [Header("Debug")]
     protected float lastUseTime = -999f;
 
@@ -20,7 +24,34 @@ public abstract class Power : MonoBehaviour
         {
             DoBehavior(aimTarget);
             lastUseTime = Time.time;
+            PlayAttackSound();
         }
+    }
+
+    protected virtual void PlayAttackSound()
+    {
+        if (attackSound == null) return;
+        
+        // Try to find PlayerControls in parent hierarchy (mask is attached to player)
+        var playerControls = GetComponentInParent<PlayerControls>();
+        if (playerControls != null)
+        {
+            // Use networked sound - broadcasts to all clients
+            playerControls.PlayAttackSoundNetworked(attackSound, attackSoundVolume);
+        }
+        else
+        {
+            // Fallback for non-player usage (e.g., testing)
+            AudioSource.PlayClipAtPoint(attackSound, transform.position, attackSoundVolume);
+        }
+    }
+
+    /// <summary>
+    /// Returns the attack sound clip for network sync purposes.
+    /// </summary>
+    public AudioClip GetAttackSound()
+    {
+        return attackSound;
     }
 
     protected abstract void DoBehavior(Vector3 aimTarget);

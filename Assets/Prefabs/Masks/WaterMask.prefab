@@ -167,5 +167,7 @@ MonoBehaviour:
   cooldownTime: 1
   projectileSpeed: 10
   projectilePrefab: {fileID: 795956235146185913, guid: 6d0a67ea056927e4dae54bad28b5a3db, type: 3}
+  attackSound: {fileID: 8300000, guid: 83ba209e749916644b26596f590d417c, type: 3}
+  attackSoundVolume: 1
   numBullets: 64
   spawnRadius: 2

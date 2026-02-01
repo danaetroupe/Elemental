@@ -357,4 +357,52 @@ public class PlayerControls : NetworkBehaviour
 
         sprite.flipX = faceRight;
     }
+
+    // ============ Audio ============
+    
+    /// <summary>
+    /// Called by Power scripts to play attack sounds for all clients.
+    /// </summary>
+    public void PlayAttackSoundNetworked(AudioClip clip, float volume)
+    {
+        if (clip == null) return;
+
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        {
+            // Server broadcasts to all clients
+            PlayAttackSoundClientRpc(volume);
+        }
+        else if (NetworkManager.Singleton == null)
+        {
+            // Offline mode - play locally
+            AudioSource.PlayClipAtPoint(clip, transform.position, volume);
+        }
+    }
+
+    // Store reference to the clip for ClientRpc (can't send AudioClip over network)
+    private AudioClip pendingAttackSound;
+
+    public void SetPendingAttackSound(AudioClip clip)
+    {
+        pendingAttackSound = clip;
+    }
+
+    [ClientRpc]
+    private void PlayAttackSoundClientRpc(float volume)
+    {
+        // Each client plays the sound locally
+        // The clip comes from the equipped mask's Power component
+        if (currentMask != null)
+        {
+            var power = currentMask.GetComponent<MaskController>()?.GetPower();
+            if (power != null)
+            {
+                var clip = power.GetAttackSound();
+                if (clip != null)
+                {
+                    AudioSource.PlayClipAtPoint(clip, transform.position, volume);
+                }
+            }
+        }
+    }
 }

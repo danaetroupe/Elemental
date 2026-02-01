@@ -9,6 +9,10 @@ public class HealthController : NetworkBehaviour
     [Header("Health Settings")]
     [SerializeField] private int starterHealth = 100;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip deathSound;
+    [SerializeField] private float deathSoundVolume = 1f;
+
     [Header("Events")]
     public UnityEvent<Vector3> OnDeath;
     public UnityEvent<int, int> OnHealthChanged;
@@ -105,11 +109,15 @@ public class HealthController : NetworkBehaviour
     {
         OnDeath?.Invoke(gameObject.transform.position);
 
+        // Player respawn path
         if (TryGetComponent<PlayerControls>(out _))
         {
             Respawn();
             return;
         }
+
+        // Non-player death (enemies, etc.) - play death sound then despawn
+        PlayDeathSound();
 
         if (TryGetComponent<NetworkObject>(out var no) && no.IsSpawned)
         {
@@ -121,6 +129,34 @@ public class HealthController : NetworkBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    private void PlayDeathSound()
+    {
+        if (deathSound == null) return;
+
+        Vector3 deathPosition = transform.position;
+
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && IsSpawned)
+        {
+            // Broadcast to all clients before despawn
+            PlayDeathSoundClientRpc(deathPosition);
+        }
+        else if (NetworkManager.Singleton == null)
+        {
+            // Offline mode
+            AudioSource.PlayClipAtPoint(deathSound, deathPosition, deathSoundVolume);
+        }
+    }
+
+    [ClientRpc]
+    private void PlayDeathSoundClientRpc(Vector3 position)
+    {
+        // Play at the death position (object may be destroyed, so we use the passed position)
+        if (deathSound != null)
+        {
+            AudioSource.PlayClipAtPoint(deathSound, position, deathSoundVolume);
+        }
     }
 
     private void Respawn()
@@ -161,5 +197,39 @@ public class HealthController : NetworkBehaviour
     public int GetMaxHealth()
     {
         return starterHealth;
+    }
+
+    // ============ Audio (for entities without PlayerControls) ============
+
+    /// <summary>
+    /// Plays the attack sound from the Power component, broadcast to all clients.
+    /// Used by enemies and other non-player entities.
+    /// </summary>
+    public void PlayPowerSoundNetworked(float volume = 1f)
+    {
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && IsSpawned)
+        {
+            PlayPowerSoundClientRpc(volume);
+        }
+        else if (NetworkManager.Singleton == null)
+        {
+            // Offline mode - get sound from Power component
+            var power = GetComponent<Power>();
+            if (power != null && power.GetAttackSound() != null)
+            {
+                AudioSource.PlayClipAtPoint(power.GetAttackSound(), transform.position, volume);
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void PlayPowerSoundClientRpc(float volume)
+    {
+        // Each client gets the sound from their local Power component (same prefab = same AudioClip)
+        var power = GetComponent<Power>();
+        if (power != null && power.GetAttackSound() != null)
+        {
+            AudioSource.PlayClipAtPoint(power.GetAttackSound(), transform.position, volume);
+        }
     }
 }

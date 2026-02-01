@@ -97,4 +97,24 @@ public class EnemyController : RadialPower
             yield return new WaitForSeconds(timeBetweenFire);
         }
     }
+
+    /// <summary>
+    /// Override to broadcast enemy attack sounds to all clients via HealthController.
+    /// </summary>
+    protected override void PlayAttackSound()
+    {
+        if (attackSound == null) return;
+
+        // Use HealthController (which is a NetworkBehaviour) to broadcast sound
+        var healthController = GetComponent<HealthController>();
+        if (healthController != null)
+        {
+            healthController.PlayPowerSoundNetworked(attackSoundVolume);
+        }
+        else
+        {
+            // Fallback if no HealthController
+            AudioSource.PlayClipAtPoint(attackSound, transform.position, attackSoundVolume);
+        }
+    }
 }
