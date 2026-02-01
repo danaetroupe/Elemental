@@ -5,6 +5,11 @@ using Unity.Netcode;
 public class PlayerControls : NetworkBehaviour
 {
     [SerializeField] float moveSpeed = 5f;
+    [SerializeField] private GameObject cameraRig;
+    [SerializeField] private MeshRenderer meshRenderer;
+
+    private readonly NetworkVariable<Color> playerColor = new NetworkVariable<Color>(writePerm: NetworkVariableWritePermission.Server);
+
 
     private Vector2 moveInput;
 
@@ -47,4 +52,33 @@ public class PlayerControls : NetworkBehaviour
         if (!IsOwner) return; 
             HandleMovement();
     }
+
+    public override void OnNetworkSpawn()
+    {
+
+        playerColor.OnValueChanged += (_, newColor) => ApplyColor(newColor);
+
+        if (IsServer)
+        {
+            // POC rule: host blue, everyone else red
+            playerColor.Value = (OwnerClientId == 0) ? Color.blue : Color.red;
+        }
+        ApplyColor(playerColor.Value);
+
+
+        if (cameraRig != null)
+            cameraRig.SetActive(IsOwner);
+    }
+
+    private void ApplyColor(Color c)
+    {
+        if (meshRenderer == null) return;
+
+        // URP usually uses "_BaseColor". Built-in Standard uses "_Color".
+        var mpb = new MaterialPropertyBlock();
+        meshRenderer.GetPropertyBlock(mpb);
+        mpb.SetColor("_BaseColor", c);
+        meshRenderer.SetPropertyBlock(mpb);
+    }
+
 }
