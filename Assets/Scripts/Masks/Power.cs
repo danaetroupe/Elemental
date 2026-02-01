@@ -50,13 +50,11 @@ public abstract class Power : MonoBehaviour
             return null;
         }
 
-        // Add or get the Projectile component
         if (!projectile.TryGetComponent<Projectile>(out var projectileScript))
         {
             Debug.Log("Projectile has no projectlie script!");
         }
 
-        // Initialize the projectile
         projectileScript.Initialize(direction.normalized, projectileSpeed);
 
 

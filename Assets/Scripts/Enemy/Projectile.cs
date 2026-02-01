@@ -12,8 +12,8 @@ public class Projectile : MonoBehaviour
 
     [Header("Lifetime")]
     [SerializeField] private float lifetimeSeconds = 5f;
-    [SerializeField] float spinDegreesPerSecond = 360f;   // set in prefab
-    [SerializeField] Vector3 spinAxis = Vector3.forward;  // pick axis that looks right
+    [SerializeField] float spinDegreesPerSecond = 360f; 
+    [SerializeField] Vector3 spinAxis = Vector3.forward;
 
     private bool IsNetworkSpawned()
     {
@@ -27,10 +27,8 @@ public class Projectile : MonoBehaviour
 
     private void OnEnable()
     {
-        // For network-spawned projectiles, only the server controls lifetime.
         if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
 
-        // Ensure projectiles don't live forever if they miss everything.
         if (lifetimeSeconds > 0f)
         {
             CancelInvoke(nameof(Despawn));
@@ -67,13 +65,11 @@ public class Projectile : MonoBehaviour
 
     void Update()
     {
-        // If this projectile is network-spawned, only the server simulates it.
         if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
 
         transform.position += direction * speed * Time.deltaTime;
         transform.Rotate(spinAxis, spinDegreesPerSecond * Time.deltaTime, Space.Self);
 
-        // Despawn if it falls below the play area.
         if (transform.position.y <= 0f)
         {
             Despawn();
@@ -82,7 +78,6 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // If this projectile is network-spawned, only the server applies hits/despawns.
         if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
 
         if (other.CompareTag("Wall"))

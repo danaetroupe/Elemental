@@ -30,7 +30,6 @@ public class MaskPickup : NetworkBehaviour
         ulong pickerClientId = player.OwnerClientId;
         Debug.Log($"[MaskPickup] Picked up by clientId={pickerClientId} (server).");
 
-        // Equip a server-only copy so the server can execute powers and spawn network projectiles.
         player.EquipMaskServerOnly(maskPrefab);
 
         var rpcParams = new ClientRpcParams

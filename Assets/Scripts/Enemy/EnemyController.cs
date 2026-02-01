@@ -27,7 +27,6 @@ public class EnemyController : RadialPower
 
     void Update()
     {
-        // In multiplayer, the server is authoritative for enemy movement.
         if (NetworkManager.Singleton != null &&
             NetworkManager.Singleton.IsListening &&
             !NetworkManager.Singleton.IsServer)

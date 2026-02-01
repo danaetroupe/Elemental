@@ -37,7 +37,6 @@ public class PlayerControls2 : NetworkBehaviour
         if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             moveInput.x = 1f;
 
-        // Normalize to prevent faster diagonal movement
         if (moveInput.magnitude > 1f)
             moveInput.Normalize();
     }
@@ -60,7 +59,6 @@ public class PlayerControls2 : NetworkBehaviour
 
         if (IsServer)
         {
-            // POC rule: host blue, everyone else red
             playerColor.Value = (OwnerClientId == 0) ? Color.blue : Color.red;
         }
         ApplyColor(playerColor.Value);
@@ -74,7 +72,6 @@ public class PlayerControls2 : NetworkBehaviour
     {
         if (meshRenderer == null) return;
 
-        // URP usually uses "_BaseColor". Built-in Standard uses "_Color".
         var mpb = new MaterialPropertyBlock();
         meshRenderer.GetPropertyBlock(mpb);
         mpb.SetColor("_BaseColor", c);

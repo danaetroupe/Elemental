@@ -73,14 +73,12 @@ public class PlayerControls : NetworkBehaviour
         var maskController = currentMask.GetComponent<MaskController>();
         if (maskController == null) return;
 
-        // Offline / singleplayer: run locally.
         if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
         {
             maskController.UsePower();
             return;
         }
 
-        // Online: the server should execute the power so spawned projectiles can be network-spawned.
         if (IsServer)
         {
             maskController.UsePower();
@@ -259,7 +257,6 @@ public class PlayerControls : NetworkBehaviour
         if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             moveInput.x = 1f;
 
-        // Normalize to prevent faster diagonal movement
         if (moveInput.magnitude > 1f)
             moveInput.Normalize();
     }
