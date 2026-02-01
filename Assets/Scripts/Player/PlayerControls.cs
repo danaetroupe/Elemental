@@ -175,6 +175,10 @@ public class PlayerControls : NetworkBehaviour
     }
     public override void OnNetworkSpawn()
     {
+        var playerInput = GetComponent<PlayerInput>();
+        if (playerInput != null)
+            playerInput.enabled = IsOwner;
+
         if (cameraRig != null)
             cameraRig.SetActive(IsOwner);
     }
