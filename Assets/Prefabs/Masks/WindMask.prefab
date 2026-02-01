@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2890330804617778105}
   - component: {fileID: 3778035084642030915}
   - component: {fileID: 5618751821834125918}
-  - component: {fileID: 8295555111612124993}
+  - component: {fileID: -401060775949318331}
   m_Layer: 0
   m_Name: WindMask
   m_TagString: Untagged
@@ -147,11 +147,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskController
   characterColor: {r: 1, g: 1, b: 1, a: 1}
-  power: {fileID: 8295555111612124993}
+  power: {fileID: 0}
   rotationSpeed: 50
   bobSpeed: 2
   bobHeight: 0.3
---- !u!114 &8295555111612124993
+--- !u!114 &-401060775949318331
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -160,9 +160,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 3790184400001474309}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 368b0c6609b7823469b264ae0a145662, type: 3}
+  m_Script: {fileID: 11500000, guid: 329bc9de01144e7459fd06fe84c97281, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnimatedPower
+  m_EditorClassIdentifier: Assembly-CSharp::MovePower
   cooldownTime: 1
   projectileSpeed: 10
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 5353094571180383623, guid: b907596259270034eb0c8d677b62d52d, type: 3}
+  frames:
+  - {fileID: 0}
+  frameRate: 12
+  animationOffset: {x: 0, y: 0}
+  pushForce: 10
+  pushRadius: 5

@@ -970,10 +970,6 @@ PrefabInstance:
       propertyPath: maskToSpawn
       value: 
       objectReference: {fileID: 3464314528544800817, guid: 90a0e596dc817ba42bfdd985123adec0, type: 3}
-    - target: {fileID: 1611846403047341347, guid: f2e1eaf3d79801447a4c36db42af2131, type: 3}
-      propertyPath: spawnOffset.y
-      value: 0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 6372378798552624255, guid: f2e1eaf3d79801447a4c36db42af2131, type: 3}
       propertyPath: m_Name
       value: MaskSpawner
