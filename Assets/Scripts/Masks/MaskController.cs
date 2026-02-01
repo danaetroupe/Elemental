@@ -60,8 +60,8 @@ public class MaskController : MonoBehaviour
         Debug.Log($"Power set to: {(newPower != null ? newPower.GetType().Name : "None")}");
     }
 
-    public void UsePower()
+    public void UsePower(Vector3 aimTarget = default)
     {
-        power.UsePower();
+        power.UsePower(aimTarget);
     }
 }

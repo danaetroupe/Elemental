@@ -14,16 +14,16 @@ public abstract class Power : MonoBehaviour
     [Header("Debug")]
     protected float lastUseTime = -999f;
 
-    public  void UsePower()
+    public void UsePower(Vector3 aimTarget = default)
     {
         if (IsReady())
         {
-            DoBehavior();
+            DoBehavior(aimTarget);
             lastUseTime = Time.time;
         }
     }
 
-    protected abstract void DoBehavior();
+    protected abstract void DoBehavior(Vector3 aimTarget);
 
     public virtual bool IsReady()
     {

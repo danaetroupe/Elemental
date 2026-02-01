@@ -22,40 +22,37 @@ public class MovePower : Power
         }
     }
 
-    protected override void DoBehavior()
+    protected override void DoBehavior(Vector3 aimTarget)
     {
-        Vector2 screenPosition = Mouse.current.position.ReadValue();
-        RectTransform canvasRect = mainCanvas.GetComponent<RectTransform>();
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect,
-            screenPosition,
-            mainCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : Camera.main,
-            out Vector2 localPoint
-        );
-
-        // Create and setup UI animation
-        GameObject imageObject = new GameObject("ImageProjectile");
-        Image image = imageObject.AddComponent<Image>();
-        image.sprite = frames[0];
-        imageObject.transform.SetParent(mainCanvas.transform, false);
-        RectTransform rectTransform = imageObject.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = localPoint + animationOffset;
-        rectTransform.localScale = Vector3.one * 3f;
-
-        StartCoroutine(AnimateFrames(imageObject, image));
-
-        // Spawn projectile and apply push force
-        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        // UI animation uses local mouse for visuals (client-side only)
+        if (mainCanvas != null && Mouse.current != null)
         {
-            Vector3 worldPosition = hit.point;
+            Vector2 screenPosition = Mouse.current.position.ReadValue();
+            RectTransform canvasRect = mainCanvas.GetComponent<RectTransform>();
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect,
+                screenPosition,
+                mainCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : Camera.main,
+                out Vector2 localPoint
+            );
 
-            // Push enemies away from impact point
-            PushEnemiesAway(worldPosition);
+            // Create and setup UI animation
+            GameObject imageObject = new GameObject("ImageProjectile");
+            Image image = imageObject.AddComponent<Image>();
+            image.sprite = frames[0];
+            imageObject.transform.SetParent(mainCanvas.transform, false);
+            RectTransform rectTransform = imageObject.GetComponent<RectTransform>();
+            rectTransform.anchoredPosition = localPoint + animationOffset;
+            rectTransform.localScale = Vector3.one * 3f;
 
-            // Spawn the projectile
-            SpawnProjectile(worldPosition + Vector3.up, Vector3.down);
+            StartCoroutine(AnimateFrames(imageObject, image));
         }
+
+        // Push enemies away from aimTarget (passed from client via ServerRpc)
+        PushEnemiesAway(aimTarget);
+
+        // Spawn the projectile at aimTarget
+        SpawnProjectile(aimTarget + Vector3.up, Vector3.down);
     }
 
     void PushEnemiesAway(Vector3 center)

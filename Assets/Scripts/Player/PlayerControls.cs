@@ -101,31 +101,51 @@ public class PlayerControls : NetworkBehaviour
         var maskController = currentMask.GetComponent<MaskController>();
         if (maskController == null) return;
 
+        // Compute aim target on client (for DirectionalPower)
+        Vector3 aimTarget = ComputeAimTarget();
+
         if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
         {
-            maskController.UsePower();
+            maskController.UsePower(aimTarget);
             return;
         }
 
         if (IsServer)
         {
-            maskController.UsePower();
+            maskController.UsePower(aimTarget);
         }
         else if (IsOwner)
         {
-            UseMaskPowerServerRpc();
+            UseMaskPowerServerRpc(aimTarget);
         }
     }
 
+    private Vector3 ComputeAimTarget()
+    {
+        if (Camera.main == null || Mouse.current == null)
+            return transform.position;
+
+        Vector3 screenPos = Mouse.current.position.ReadValue();
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            return hit.point;
+        }
+
+        // Fallback: point on ground plane at some distance
+        return transform.position + transform.forward * 10f;
+    }
+
     [ServerRpc(RequireOwnership = true)]
-    private void UseMaskPowerServerRpc()
+    private void UseMaskPowerServerRpc(Vector3 aimTarget)
     {
         if (currentMask == null) return;
 
         var maskController = currentMask.GetComponent<MaskController>();
         if (maskController == null) return;
 
-        maskController.UsePower();
+        maskController.UsePower(aimTarget);
     }
 
     public void EquipMaskServerOnly(GameObject maskPrefab)
