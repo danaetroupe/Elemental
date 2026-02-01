@@ -8,6 +8,7 @@ public class AnimatedPower : Power
 {
     [SerializeField] List<Sprite> frames;
     [SerializeField] float frameRate = 12f;
+    [SerializeField] Vector2 animationOffset = new Vector2(0, 150f);
 
     private Canvas mainCanvas;
 
@@ -38,7 +39,8 @@ public class AnimatedPower : Power
         imageObject.transform.SetParent(mainCanvas.transform, false);
 
         RectTransform rectTransform = imageObject.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = localPoint;
+        rectTransform.anchoredPosition = localPoint + animationOffset;
+        rectTransform.localScale = Vector3.one * 3f; // Let's make this bigger!
 
         StartCoroutine(AnimateFrames(imageObject, image));
 
@@ -48,7 +50,7 @@ public class AnimatedPower : Power
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             Vector3 worldPosition = hit.point;
-            SpawnProjectile(worldPosition, Vector3.down);
+            SpawnProjectile(worldPosition + Vector3.up, Vector3.down);
         }
     }
 

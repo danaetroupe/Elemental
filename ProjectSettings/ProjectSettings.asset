@@ -928,11 +928,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: b3752995-da46-47ed-8636-f83afe18e6e5
+  cloudProjectId: 4659b6c7-d216-41f2-9376-837ad62880de
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: UGSTestBunny2
-  organizationId: cosmic-kaiju
+  projectName: ggj-26
+  organizationId: unity_3dac1b1071e89729531a
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

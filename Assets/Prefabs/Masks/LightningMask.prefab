@@ -177,3 +177,4 @@ MonoBehaviour:
   - {fileID: 21300000, guid: eb6ce4d3188247e4a82b60e2e37add4a, type: 3}
   - {fileID: 21300000, guid: 9ef75e27c04e4174da7c5b92499d0de8, type: 3}
   frameRate: 12
+  animationOffset: {x: 0, y: 150}

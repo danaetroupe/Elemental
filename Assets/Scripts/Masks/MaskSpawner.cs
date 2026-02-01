@@ -74,12 +74,12 @@ public class MaskSpawner : MonoBehaviour
     private void SpawnMask(Vector3 position)
     {
         // Instantiate the mask prefab
-        GameObject spawnedMask = Instantiate(maskToSpawn, position, Quaternion.identity);
+        GameObject spawnedMask = Instantiate(maskToSpawn, position, Quaternion.Euler(90, 0, 0));
 
         // Spawn visual effect if assigned
         if (spawnEffectPrefab != null)
         {
-            GameObject effect = Instantiate(spawnEffectPrefab, position, Quaternion.identity);
+            GameObject effect = Instantiate(spawnEffectPrefab, position, Quaternion.Euler(90, 0, 0));
             Destroy(effect, 2f); // Auto-destroy effect after 2 seconds
         }
 
