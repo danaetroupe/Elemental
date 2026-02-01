@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskController
   characterColor: {r: 0.9433962, g: 0.76756054, b: 0.2462323, a: 1}
-  power: {fileID: 0}
+  power: {fileID: 6941650625834321634}
   rotationSpeed: 50
   bobSpeed: 2
   bobHeight: 0.3
@@ -167,5 +167,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimatedPower
   cooldownTime: 1
-  projectileSpeed: 10
-  projectilePrefab: {fileID: 8612959731608210511}
+  projectileSpeed: 20
+  projectilePrefab: {fileID: 5353094571180383623, guid: b907596259270034eb0c8d677b62d52d, type: 3}
+  frames:
+  - {fileID: 21300000, guid: 190f02698498e1e42997e4c06a83f356, type: 3}
+  - {fileID: 21300000, guid: 2ed84e6d8f5c02949a22c4ad23ce8edb, type: 3}
+  - {fileID: 21300000, guid: 385b92167643f464981a69fc6f188b6d, type: 3}
+  - {fileID: 21300000, guid: 69a46cc36c5b8b345a4c30e5a6387b32, type: 3}
+  - {fileID: 21300000, guid: eb6ce4d3188247e4a82b60e2e37add4a, type: 3}
+  - {fileID: 21300000, guid: 9ef75e27c04e4174da7c5b92499d0de8, type: 3}
+  frameRate: 12
