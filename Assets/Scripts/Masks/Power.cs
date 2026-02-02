@@ -22,9 +22,14 @@ public abstract class Power : MonoBehaviour
     {
         if (IsReady())
         {
+            Debug.Log($"[Power] Firing power '{GetType().Name}' on '{gameObject.name}'");
             DoBehavior(aimTarget);
             lastUseTime = Time.time;
             PlayAttackSound();
+        }
+        else
+        {
+            Debug.Log($"[Power] Power '{GetType().Name}' on cooldown. Remaining: {GetRemainingCooldown():F2}s");
         }
     }
 
@@ -74,10 +79,11 @@ public abstract class Power : MonoBehaviour
         if (projectilePrefab != null)
         {
             projectile = Instantiate(projectilePrefab, origin, Quaternion.identity);
+            Debug.Log($"[Power] Spawned projectile '{projectilePrefab.name}' at {origin}");
         }
         else
         {
-            Debug.Log("No projectile added");
+            Debug.LogError($"[Power] No projectilePrefab assigned on '{gameObject.name}'! Cannot spawn projectile.");
             return null;
         }
 

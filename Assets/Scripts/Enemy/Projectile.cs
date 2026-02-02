@@ -60,7 +60,7 @@ public class Projectile : MonoBehaviour
         direction = dir.normalized;
         speed = spd;
         spinDegreesPerSecond *= (Random.value < 0.5f) ? -1f : 1f;
-
+        Debug.Log($"[Projectile] Initialized at position {transform.position}, direction {direction}, speed {speed}");
     }
 
     void Update()
@@ -72,6 +72,7 @@ public class Projectile : MonoBehaviour
 
         if (transform.position.y <= 0f)
         {
+            Debug.Log($"[Projectile] Despawning because Y position ({transform.position.y}) <= 0");
             Despawn();
         }
     }

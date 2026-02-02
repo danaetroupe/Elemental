@@ -96,10 +96,20 @@ public class PlayerControls : NetworkBehaviour
 
     private void TryUseEquippedPower()
     {
-        if (currentMask == null) return;
+        if (currentMask == null)
+        {
+            Debug.LogWarning("[PlayerControls] TryUseEquippedPower: No mask equipped!");
+            return;
+        }
 
         var maskController = currentMask.GetComponent<MaskController>();
-        if (maskController == null) return;
+        if (maskController == null)
+        {
+            Debug.LogError($"[PlayerControls] TryUseEquippedPower: Mask '{currentMask.name}' has no MaskController!");
+            return;
+        }
+        
+        Debug.Log($"[PlayerControls] TryUseEquippedPower: Using mask '{currentMask.name}'");
 
         // Compute aim target on client (for DirectionalPower)
         Vector3 aimTarget = ComputeAimTarget();

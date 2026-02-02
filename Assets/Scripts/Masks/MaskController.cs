@@ -62,6 +62,12 @@ public class MaskController : MonoBehaviour
 
     public void UsePower(Vector3 aimTarget = default)
     {
+        if (power == null)
+        {
+            Debug.LogError($"[MaskController] Power is NULL on mask '{gameObject.name}'! Cannot fire projectile.");
+            return;
+        }
+        Debug.Log($"[MaskController] UsePower called on '{gameObject.name}' with power type: {power.GetType().Name}");
         power.UsePower(aimTarget);
     }
 }
