@@ -483,6 +483,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealthController
   ShowTopMostFoldoutHeaderGroup: 1
   starterHealth: 100
+  deathSound: {fileID: 8300000, guid: afec133b69d58404f81b44a08111eeab, type: 3}
+  deathSoundVolume: 1
+  respawnSound: {fileID: 8300000, guid: a400b356e706d7e4db6fb59808132042, type: 3}
+  respawnSoundVolume: 1
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -594,11 +598,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
   AuthorityMode: 1
   m_Animator: {fileID: 3961649744627907883}
   TransitionStateInfoList: []
   AnimatorParameterEntries:
-    ParameterEntries: []
+    ParameterEntries:
+    - name: moveInputX
+      NameHash: -297029875
+      Synchronize: 1
+      ParameterType: 1
+    - name: moveInputY
+      NameHash: -1723031653
+      Synchronize: 1
+      ParameterType: 1
+    - name: isMovingX
+      NameHash: -711888002
+      Synchronize: 1
+      ParameterType: 1
+    - name: isMovingY
+      NameHash: -1567210520
+      Synchronize: 1
+      ParameterType: 1
+  AnimatorParametersExpanded: 0
 --- !u!4 &3271674659121448085 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3013758871876542252, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
