@@ -8,6 +8,8 @@ public class HealthController : NetworkBehaviour
 {
     [Header("Health Settings")]
     [SerializeField] private int starterHealth = 100;
+    [Tooltip("Non-player only. Turn off when another script handles the death (e.g. the boss).")]
+    [SerializeField] private bool despawnOnDeath = true;
 
     [Header("Audio")]
     [SerializeField] private AudioClip deathSound;
@@ -21,6 +23,9 @@ public class HealthController : NetworkBehaviour
 
     private int currentHealth;
     private Vector3 spawnPosition;
+    private bool isDead;
+
+    public bool Invulnerable { get; set; }
     private readonly NetworkVariable<int> networkHealth = new NetworkVariable<int>(
         0,
         NetworkVariableReadPermission.Everyone,
@@ -66,6 +71,8 @@ public class HealthController : NetworkBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (Invulnerable || isDead) return;
+
         if (UseNetworkedHealth())
         {
             if (!NetworkManager.Singleton.IsServer)
@@ -119,7 +126,10 @@ public class HealthController : NetworkBehaviour
         }
 
         // Non-player death (enemies, etc.) - play death sound then despawn
+        isDead = true;
         PlayDeathSound();
+
+        if (!despawnOnDeath) return;
 
         if (TryGetComponent<NetworkObject>(out var no) && no.IsSpawned)
         {

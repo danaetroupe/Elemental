@@ -15,6 +15,8 @@ public class Projectile : MonoBehaviour
     [SerializeField] float spinDegreesPerSecond = 360f; 
     [SerializeField] Vector3 spinAxis = Vector3.forward;
 
+    private bool hasDespawned;
+
     private bool IsNetworkSpawned()
     {
         return TryGetComponent<NetworkObject>(out var no) && no.IsSpawned;
@@ -43,6 +45,8 @@ public class Projectile : MonoBehaviour
 
     private void Despawn()
     {
+        hasDespawned = true;
+
         if (TryGetComponent<NetworkObject>(out var no) && no.IsSpawned)
         {
             if (IsServerAuthoritative())
@@ -79,6 +83,7 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (hasDespawned) return;
         if (IsNetworkSpawned() && !IsServerAuthoritative()) return;
 
         if (other.TryGetComponent<Projectile>(out _))
@@ -98,13 +103,17 @@ public class Projectile : MonoBehaviour
             }
             Despawn();
         }
-        else if(isPlayerProjectile && other.CompareTag("Enemy"))
+        else if (isPlayerProjectile)
         {
-            if (other.TryGetComponent<HealthController>(out var enemyHealth))
+            var enemyHealth = other.GetComponentInParent<HealthController>();
+            if (other.CompareTag("Enemy") || (enemyHealth != null && enemyHealth.CompareTag("Enemy")))
             {
-                enemyHealth.TakeDamage(damage);
+                if (enemyHealth != null)
+                {
+                    enemyHealth.TakeDamage(damage);
+                }
+                Despawn();
             }
-            Despawn();
         }
     }
 }
