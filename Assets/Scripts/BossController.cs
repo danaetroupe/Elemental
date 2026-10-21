@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BossController : MonoBehaviour
+public class BossController : NetworkBehaviour
 {
     [Header("Visual Components")]
     [SerializeField] private MeshRenderer bodyRenderer;
@@ -43,6 +43,9 @@ public class BossController : MonoBehaviour
     [Header("Health")]
     [SerializeField] private HealthController healthController;
 
+    [Header("Victory")]
+    [SerializeField] private GameObject victoryScreen; // Shown on every player's screen when the boss dies
+
     // State tracking
     private bool isFightActive = false;
     private bool fightStarted = false;
@@ -50,6 +53,10 @@ public class BossController : MonoBehaviour
     private List<GameObject> spawnedEnemies = new List<GameObject>();
     private Vector3 headOriginalPosition;
     private float headShakeAmount = 0.1f;
+
+    // The fight runs on the server (or offline); visuals are mirrored to every client by RPC.
+    private bool IsNetworked => NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && IsSpawned;
+    private bool RunsFight => !IsNetworked || IsServer;
 
     private void Start()
     {
@@ -59,6 +66,7 @@ public class BossController : MonoBehaviour
         if (healthController != null)
         {
             healthController.OnDeath.AddListener(OnBossDefeated);
+            healthController.Invulnerable = true; // Only vulnerable while dazed
         }
 
         // Setup trigger if it exists
@@ -74,6 +82,11 @@ public class BossController : MonoBehaviour
         else
         {
             Debug.LogWarning("No fight trigger assigned! Boss fight will not start automatically.");
+        }
+
+        if (victoryScreen != null)
+        {
+            victoryScreen.SetActive(false);
         }
 
         // Set initial materials
@@ -102,7 +115,7 @@ public class BossController : MonoBehaviour
             rightFistRenderer.enabled = false;
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
         if (healthController != null)
         {
@@ -117,10 +130,14 @@ public class BossController : MonoBehaviour
                 triggerComponent.OnTriggerActivated -= OnFightTriggered;
             }
         }
+
+        base.OnDestroy();
     }
 
     private void OnFightTriggered()
     {
+        if (!RunsFight) return;
+
         if (!fightStarted)
         {
             fightStarted = true;
@@ -130,15 +147,13 @@ public class BossController : MonoBehaviour
 
     public void StartBossFight()
     {
-        if (isFightActive) return;
+        if (isFightActive || !RunsFight) return;
 
         isFightActive = true;
 
         // Play roar to signal fight start
-        if (audioSource != null && roarSound != null)
-        {
-            audioSource.PlayOneShot(roarSound);
-        }
+        if (IsNetworked) PlayRoarClientRpc(false);
+        else PlayRoar(false);
 
         // Disable the trigger so it can't be activated again
         if (fightTrigger != null)
@@ -160,7 +175,9 @@ public class BossController : MonoBehaviour
         while (isFightActive)
         {
             // 1. Shake head angrily
-            yield return StartCoroutine(ShakeHead());
+            if (IsNetworked) ShakeHeadClientRpc();
+            else StartCoroutine(ShakeHead());
+            yield return new WaitForSeconds(headShakeDuration);
 
             // 2. Stomp attack and spawn enemies
             yield return StartCoroutine(StompAttack());
@@ -171,6 +188,28 @@ public class BossController : MonoBehaviour
             // 4. Enter dazed state
             yield return StartCoroutine(EnterDazedState());
         }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void PlayRoarClientRpc(bool defeat)
+    {
+        PlayRoar(defeat);
+    }
+
+    private void PlayRoar(bool defeat)
+    {
+        AudioClip roarToPlay = defeat && defeatRoarSound != null ? defeatRoarSound : roarSound;
+
+        if (audioSource != null && roarToPlay != null)
+        {
+            audioSource.PlayOneShot(roarToPlay);
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ShakeHeadClientRpc()
+    {
+        StartCoroutine(ShakeHead());
     }
 
     private IEnumerator ShakeHead()
@@ -190,6 +229,24 @@ public class BossController : MonoBehaviour
     }
 
     private IEnumerator StompAttack()
+    {
+        if (IsNetworked) StompClientRpc();
+        else StartCoroutine(StompVisuals());
+
+        // Spawn enemies on the final stomp frame
+        yield return new WaitForSeconds(stompAnimationSpeed * fistStompFrames.Length);
+        SpawnEnemies();
+
+        yield return new WaitForSeconds(stompAnimationSpeed);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void StompClientRpc()
+    {
+        StartCoroutine(StompVisuals());
+    }
+
+    private IEnumerator StompVisuals()
     {
         // Hide neutral arms, show fists
         if (leftArmRenderer != null)
@@ -218,9 +275,6 @@ public class BossController : MonoBehaviour
             yield return new WaitForSeconds(stompAnimationSpeed);
         }
 
-        // Spawn enemies on the final stomp frame
-        SpawnEnemies();
-
         yield return new WaitForSeconds(stompAnimationSpeed);
 
         // Hide fists, show neutral arms again
@@ -245,6 +299,12 @@ public class BossController : MonoBehaviour
         {
             Transform spawnPoint = spawnPoints[i % spawnPoints.Length];
             GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+
+            if (IsNetworked && enemy.TryGetComponent<NetworkObject>(out var netObj))
+            {
+                netObj.Spawn(true);
+            }
+
             spawnedEnemies.Add(enemy);
         }
     }
@@ -268,38 +328,59 @@ public class BossController : MonoBehaviour
     private IEnumerator EnterDazedState()
     {
         isDazed = true;
+        if (healthController != null)
+            healthController.Invulnerable = false;
 
-        // Swap to dazed materials
-        if (bodyDazed != null)
-            bodyRenderer.material = bodyDazed;
+        if (IsNetworked) SetDazedClientRpc(true);
+        else SetDazedVisuals(true);
 
-        if (headDazed != null)
-            headRenderer.material = headDazed;
+        yield return new WaitForSeconds(dazedDuration);
+
+        if (healthController != null)
+            healthController.Invulnerable = true;
+
+        if (IsNetworked) SetDazedClientRpc(false);
+        else SetDazedVisuals(false);
+
+        isDazed = false;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SetDazedClientRpc(bool dazed)
+    {
+        SetDazedVisuals(dazed);
+    }
+
+    private void SetDazedVisuals(bool dazed)
+    {
+        if (dazed)
+        {
+            // Swap to dazed materials
+            if (bodyDazed != null)
+                bodyRenderer.material = bodyDazed;
+
+            if (headDazed != null)
+                headRenderer.material = headDazed;
+        }
+        else
+        {
+            // Return to normal materials
+            if (bodyNormal != null)
+                bodyRenderer.material = bodyNormal;
+
+            if (headNormal != null)
+                headRenderer.material = headNormal;
+        }
 
         // Hide arms and fists during dazed state
-        leftArmRenderer.enabled = false;
-        rightArmRenderer.enabled = false;
+        leftArmRenderer.enabled = !dazed;
+        rightArmRenderer.enabled = !dazed;
 
         if (leftFistRenderer != null)
             leftFistRenderer.enabled = false;
 
         if (rightFistRenderer != null)
             rightFistRenderer.enabled = false;
-
-        yield return new WaitForSeconds(dazedDuration);
-
-        // Return to normal materials
-        if (bodyNormal != null)
-            bodyRenderer.material = bodyNormal;
-
-        if (headNormal != null)
-            headRenderer.material = headNormal;
-
-        // Show neutral arms again
-        leftArmRenderer.enabled = true;
-        rightArmRenderer.enabled = true;
-
-        isDazed = false;
     }
 
     private void OnBossDefeated(Vector3 deathPosition)
@@ -307,41 +388,45 @@ public class BossController : MonoBehaviour
         isFightActive = false;
         StopAllCoroutines();
 
+        // Clear out any minions still alive
+        foreach (GameObject enemy in spawnedEnemies)
+        {
+            if (enemy == null) continue;
+
+            if (IsNetworked && enemy.TryGetComponent<NetworkObject>(out var netObj) && netObj.IsSpawned)
+                netObj.Despawn(true);
+            else
+                Destroy(enemy);
+        }
+        spawnedEnemies.Clear();
+
         // Play victory sequence
+        if (IsNetworked) DefeatClientRpc();
+        else StartCoroutine(DefeatSequence());
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void DefeatClientRpc()
+    {
+        StopAllCoroutines();
         StartCoroutine(DefeatSequence());
     }
 
     private IEnumerator DefeatSequence()
     {
         // Play defeat roar sound (or reuse the same roar)
-        AudioClip roarToPlay = defeatRoarSound != null ? defeatRoarSound : roarSound;
+        PlayRoar(true);
 
-        if (audioSource != null && roarToPlay != null)
-        {
-            audioSource.PlayOneShot(roarToPlay);
-        }
-
-        // Swap to dazed materials for defeat
-        if (bodyDazed != null)
-            bodyRenderer.material = bodyDazed;
-
-        if (headDazed != null)
-            headRenderer.material = headDazed;
-
-        // Hide all arms and fists
-        leftArmRenderer.enabled = false;
-        rightArmRenderer.enabled = false;
-
-        if (leftFistRenderer != null)
-            leftFistRenderer.enabled = false;
-
-        if (rightFistRenderer != null)
-            rightFistRenderer.enabled = false;
+        // Swap to dazed materials for defeat, hide all arms and fists
+        headRenderer.transform.localPosition = headOriginalPosition;
+        SetDazedVisuals(true);
 
         yield return new WaitForSeconds(2f);
 
-        // Trigger game win
-        // GameManager.Instance?.OnPlayerWin(); // Uncomment if you have a GameManager
         Debug.Log("Player Wins!");
+        if (victoryScreen != null)
+        {
+            victoryScreen.SetActive(true);
+        }
     }
 }
