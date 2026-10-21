@@ -26,6 +26,7 @@ public class PlayerControls : NetworkBehaviour
     private List<GameObject> maskInventory = new List<GameObject>();
 
     private GameObject maskVisualInstance;
+    private GameObject sceneCamera;
 
     private SpriteRenderer spriteRenderer;
     private Animator animator;
@@ -55,6 +56,8 @@ public class PlayerControls : NetworkBehaviour
 
     public void OnDodge(InputAction.CallbackContext context)
     {
+        if (!context.performed) return;
+
         if (Time.time >= lastDodgeTime + dodgeCooldown)
         {
             lastDodgeTime = Time.time;
@@ -75,6 +78,8 @@ public class PlayerControls : NetworkBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
+        if (!context.performed) return;
+
         if (Time.time >= lastAttackTime + attackCooldown)
         {
             lastAttackTime = Time.time;
@@ -114,31 +119,39 @@ public class PlayerControls : NetworkBehaviour
         // Compute aim target on client (for DirectionalPower)
         Vector3 aimTarget = ComputeAimTarget();
 
-        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening || IsServer)
         {
-            maskController.UsePower(aimTarget);
+            if (maskController.UsePower(aimTarget))
+            {
+                maskController.PlayLocalEffect();
+            }
             return;
         }
 
-        if (IsServer)
+        if (IsOwner && maskController.TryStartLocalCooldown())
         {
-            maskController.UsePower(aimTarget);
-        }
-        else if (IsOwner)
-        {
+            maskController.PlayLocalEffect();
             UseMaskPowerServerRpc(aimTarget);
         }
     }
 
+    private Camera GetAimCamera()
+    {
+        if (cameraRig != null && cameraRig.activeInHierarchy && cameraRig.TryGetComponent<Camera>(out var ownCamera))
+            return ownCamera;
+        return Camera.main;
+    }
+
     private Vector3 ComputeAimTarget()
     {
-        if (Camera.main == null || Mouse.current == null)
+        Camera aimCamera = GetAimCamera();
+        if (aimCamera == null || Mouse.current == null)
             return transform.position;
 
         Vector3 screenPos = Mouse.current.position.ReadValue();
-        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+        Ray ray = aimCamera.ScreenPointToRay(screenPos);
 
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
         {
             return hit.point;
         }
@@ -200,6 +213,9 @@ public class PlayerControls : NetworkBehaviour
         currentMask.transform.localPosition = Vector3.zero;
         currentMask.transform.localRotation = Quaternion.identity;
 
+        foreach (var col in currentMask.GetComponentsInChildren<Collider>(true))
+            col.enabled = false;
+
         if (!maskInventory.Contains(newMask))
         {
             maskInventory.Add(newMask);
@@ -256,6 +272,53 @@ public class PlayerControls : NetworkBehaviour
         // TODO: Change character appearance based on maskController.characterColor
     }
 
+    public void OnPrevious(InputAction.CallbackContext context)
+    {
+        if (context.performed) CycleMask(-1);
+    }
+
+    public void OnNext(InputAction.CallbackContext context)
+    {
+        if (context.performed) CycleMask(1);
+    }
+
+    private void CycleMask(int step)
+    {
+        if (!IsOwner || maskInventory.Count < 2) return;
+
+        int index = maskInventory.IndexOf(currentMask);
+        int newIndex = (index + step + maskInventory.Count) % maskInventory.Count;
+        SelectMask(newIndex);
+
+        if (IsSpawned && !IsServer)
+        {
+            SelectMaskServerRpc(newIndex);
+        }
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+    private void SelectMaskServerRpc(int index)
+    {
+        SelectMask(index);
+    }
+
+    private void SelectMask(int index)
+    {
+        if (index < 0 || index >= maskInventory.Count) return;
+
+        currentMask = maskInventory[index];
+        OnMaskChanged?.Invoke(maskInventory, currentMask);
+        Debug.Log($"Selected mask: {currentMask.name}");
+    }
+
+    public bool HasMask(GameObject maskPrefab)
+    {
+        if (maskPrefab == null) return false;
+
+        string cloneName = maskPrefab.name + "(Clone)";
+        return maskInventory.Exists(mask => mask != null && mask.name == cloneName);
+    }
+
     public void AddMaskToInventory(GameObject mask)
     {
         if (mask != null && !maskInventory.Contains(mask))
@@ -310,7 +373,10 @@ public class PlayerControls : NetworkBehaviour
     private void ReadMovementInput()
     {
         moveInput = Vector2.zero;
-        
+
+        if (Keyboard.current == null)
+            return;
+
         if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
             moveInput.y = 1f;
         if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
@@ -337,6 +403,23 @@ public class PlayerControls : NetworkBehaviour
         if (cameraRig != null)
             cameraRig.SetActive(IsOwner);
 
+        if (IsOwner)
+        {
+            if (cameraRig != null)
+            {
+                foreach (var cam in GameObject.FindGameObjectsWithTag("MainCamera"))
+                {
+                    if (cam.transform.IsChildOf(transform)) continue;
+                    sceneCamera = cam;
+                    sceneCamera.SetActive(false);
+                }
+            }
+
+            var hud = FindFirstObjectByType<PlayerHUDController>();
+            if (hud != null)
+                OnMaskChanged.AddListener(hud.OnChange);
+        }
+
         facingRight.OnValueChanged += HandleFacingChanged;
         if (IsOwner && sprite != null)
         {
@@ -351,6 +434,9 @@ public class PlayerControls : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         facingRight.OnValueChanged -= HandleFacingChanged;
+
+        if (sceneCamera != null)
+            sceneCamera.SetActive(true);
     }
 
     private void HandleFacingChanged(bool previousValue, bool newValue)

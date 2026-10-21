@@ -370,6 +370,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[6].m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 0
       objectReference: {fileID: 0}
@@ -378,7 +386,23 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 482031815654448418}
     - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[6].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 482031815654448418}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 482031815654448418}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[6].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
@@ -386,7 +410,23 @@ PrefabInstance:
       value: OnAttack
       objectReference: {fileID: 0}
     - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[6].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnPrevious
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnNext
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PlayerControls, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[6].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PlayerControls, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PlayerControls, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 6656235501630340043, guid: 29786301c77abcc48b1a749e19f0f504, type: 3}
@@ -467,7 +507,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1266641859015398678
 MonoBehaviour:
@@ -483,6 +523,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealthController
   ShowTopMostFoldoutHeaderGroup: 1
   starterHealth: 100
+  despawnOnDeath: 1
   deathSound: {fileID: 8300000, guid: afec133b69d58404f81b44a08111eeab, type: 3}
   deathSoundVolume: 1
   respawnSound: {fileID: 8300000, guid: a400b356e706d7e4db6fb59808132042, type: 3}
