@@ -21,7 +21,7 @@ public class MaskPickup : NetworkBehaviour
         if (!IsServer || consumed) return;
 
         var player = other.GetComponentInParent<PlayerControls>();
-        if (player == null) return;
+        if (player == null || player.HasMask(maskPrefab)) return;
 
         consumed = true;
 
@@ -109,6 +109,9 @@ public class MaskPickup : NetworkBehaviour
     [ClientRpc]
     private void EquipMaskClientRpc(ulong pickerClientId, ClientRpcParams rpcParams = default)
     {
+        // The host's player already got its mask from EquipMaskServerOnly.
+        if (IsServer) return;
+
         if (maskPrefab == null)
         {
             Debug.LogError("[MaskPickup] maskPrefab is not assigned on the pickup.");

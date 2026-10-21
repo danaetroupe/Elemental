@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class MaskSpawner2 : MonoBehaviour
@@ -94,6 +95,12 @@ public class MaskSpawner2 : MonoBehaviour
     {
         // Instantiate the mask prefab
         GameObject spawnedMask = Instantiate(maskToSpawn, position, Quaternion.Euler(90, 0, 0));
+
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer &&
+            spawnedMask.TryGetComponent<NetworkObject>(out var netObj))
+        {
+            netObj.Spawn(true);
+        }
 
         hasSpawned = true;
         Debug.Log($"Mask spawned at position: {position}");
