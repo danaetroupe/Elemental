@@ -15,7 +15,8 @@ public class MovePower : Power
     private Canvas mainCanvas;
     void Start()
     {
-        mainCanvas = GameObject.FindGameObjectWithTag("MainCanvas").GetComponent<Canvas>();
+        GameObject canvasObject = GameObject.FindGameObjectWithTag("MainCanvas");
+        mainCanvas = canvasObject != null ? canvasObject.GetComponent<Canvas>() : null;
         if (!mainCanvas)
         {
             Debug.LogError("MainCanvas not found in scene. Please add a Canvas with the tag 'MainCanvas'.");
@@ -23,6 +24,15 @@ public class MovePower : Power
     }
 
     protected override void DoBehavior(Vector3 aimTarget)
+    {
+        // Push enemies away from aimTarget (passed from client via ServerRpc)
+        PushEnemiesAway(aimTarget);
+
+        // Spawn the projectile at aimTarget
+        SpawnProjectile(aimTarget + Vector3.up, Vector3.down);
+    }
+
+    public override void PlayLocalEffect()
     {
         // UI animation uses local mouse for visuals (client-side only)
         if (mainCanvas != null && Mouse.current != null)
@@ -47,12 +57,6 @@ public class MovePower : Power
 
             StartCoroutine(AnimateFrames(imageObject, image));
         }
-
-        // Push enemies away from aimTarget (passed from client via ServerRpc)
-        PushEnemiesAway(aimTarget);
-
-        // Spawn the projectile at aimTarget
-        SpawnProjectile(aimTarget + Vector3.up, Vector3.down);
     }
 
     void PushEnemiesAway(Vector3 center)

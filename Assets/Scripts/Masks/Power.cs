@@ -18,7 +18,7 @@ public abstract class Power : MonoBehaviour
     [Header("Debug")]
     protected float lastUseTime = -999f;
 
-    public void UsePower(Vector3 aimTarget = default)
+    public bool UsePower(Vector3 aimTarget = default)
     {
         if (IsReady())
         {
@@ -26,11 +26,29 @@ public abstract class Power : MonoBehaviour
             DoBehavior(aimTarget);
             lastUseTime = Time.time;
             PlayAttackSound();
+            return true;
         }
-        else
-        {
-            Debug.Log($"[Power] Power '{GetType().Name}' on cooldown. Remaining: {GetRemainingCooldown():F2}s");
-        }
+
+        Debug.Log($"[Power] Power '{GetType().Name}' on cooldown. Remaining: {GetRemainingCooldown():F2}s");
+        return false;
+    }
+
+    /// <summary>
+    /// Starts the cooldown without firing. Used by the owning client, whose shot runs on the server.
+    /// </summary>
+    public bool TryStartCooldown()
+    {
+        if (!IsReady()) return false;
+
+        lastUseTime = Time.time;
+        return true;
+    }
+
+    /// <summary>
+    /// Screen-space visuals for the player who fired. Runs only on that player's machine.
+    /// </summary>
+    public virtual void PlayLocalEffect()
+    {
     }
 
     protected virtual void PlayAttackSound()
@@ -87,12 +105,14 @@ public abstract class Power : MonoBehaviour
             return null;
         }
 
-        if (!projectile.TryGetComponent<Projectile>(out var projectileScript))
+        if (projectile.TryGetComponent<Projectile>(out var projectileScript))
         {
-            Debug.Log("Projectile has no projectlie script!");
+            projectileScript.Initialize(direction.normalized, projectileSpeed);
         }
-
-        projectileScript.Initialize(direction.normalized, projectileSpeed);
+        else
+        {
+            Debug.LogError($"[Power] Projectile '{projectilePrefab.name}' has no Projectile script!");
+        }
 
 
         if (NetworkManager.Singleton != null &&

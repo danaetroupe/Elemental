@@ -14,7 +14,8 @@ public class AnimatedPower : Power
 
     void Start()
     {
-        mainCanvas = GameObject.FindGameObjectWithTag("MainCanvas").GetComponent<Canvas>();
+        GameObject canvasObject = GameObject.FindGameObjectWithTag("MainCanvas");
+        mainCanvas = canvasObject != null ? canvasObject.GetComponent<Canvas>() : null;
         if (!mainCanvas)
         {
             Debug.LogError("MainCanvas not found in scene. Please add a Canvas with the tag 'MainCanvas'.");
@@ -22,7 +23,12 @@ public class AnimatedPower : Power
     }
     protected override void DoBehavior(Vector3 aimTarget)
     {
-       Vector2 screenPosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+        SpawnProjectile(aimTarget + Vector3.up, Vector3.down);
+    }
+
+    public override void PlayLocalEffect()
+    {
+        Vector2 screenPosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
 
         if (mainCanvas != null)
         {
@@ -46,8 +52,6 @@ public class AnimatedPower : Power
 
             StartCoroutine(AnimateFrames(imageObject, image));
         }
-
-        SpawnProjectile(aimTarget + Vector3.up, Vector3.down);
     }
 
     IEnumerator AnimateFrames(GameObject imageObject, Image image)

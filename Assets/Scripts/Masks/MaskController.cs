@@ -60,14 +60,27 @@ public class MaskController : MonoBehaviour
         Debug.Log($"Power set to: {(newPower != null ? newPower.GetType().Name : "None")}");
     }
 
-    public void UsePower(Vector3 aimTarget = default)
+    public bool UsePower(Vector3 aimTarget = default)
     {
         if (power == null)
         {
             Debug.LogError($"[MaskController] Power is NULL on mask '{gameObject.name}'! Cannot fire projectile.");
-            return;
+            return false;
         }
         Debug.Log($"[MaskController] UsePower called on '{gameObject.name}' with power type: {power.GetType().Name}");
-        power.UsePower(aimTarget);
+        return power.UsePower(aimTarget);
+    }
+
+    public bool TryStartLocalCooldown()
+    {
+        return power != null && power.TryStartCooldown();
+    }
+
+    public void PlayLocalEffect()
+    {
+        if (power != null)
+        {
+            power.PlayLocalEffect();
+        }
     }
 }
