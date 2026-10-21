@@ -11,16 +11,22 @@ public class EnemyController : RadialPower
     [SerializeField] private float moveSpeed = 2f;
 
     [SerializeField] private float timeBetweenFire = 2f;
+    [Tooltip("Only fires while a player is within this distance.")]
+    [SerializeField] private float aggroRange = 25f;
 
     [SerializeField] private Animator animator;
+    private SpriteRenderer spriteRenderer;
     private Vector3 startPosition;
     private Vector3 targetPosition;
+    private Vector3 lastPosition;
     private bool movingToTarget = true;
     private Coroutine fireRoutine;
 
     private void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         startPosition = transform.position;
+        lastPosition = transform.position;
         CalculateTargetPosition();
 
        StartCoroutine(BeginFiringWhenNetworkReady());
@@ -32,10 +38,46 @@ public class EnemyController : RadialPower
             NetworkManager.Singleton.IsListening &&
             !NetworkManager.Singleton.IsServer)
         {
+            AnimateFromMovement();
             return;
         }
 
         MoveEnemy();
+    }
+
+    private void AnimateFromMovement()
+    {
+        Vector3 delta = transform.position - lastPosition;
+        lastPosition = transform.position;
+        if (delta.sqrMagnitude < 0.000001f) return;
+
+        UpdateWalkAnimation(delta.normalized);
+    }
+
+    private void UpdateWalkAnimation(Vector3 direction)
+    {
+        bool horizontal = Mathf.Abs(direction.x) >= Mathf.Abs(direction.z);
+
+        if (animator != null)
+        {
+            animator.SetBool("WalkRight", horizontal);
+            animator.SetBool("WalkUp", !horizontal);
+        }
+
+        if (horizontal && spriteRenderer != null)
+        {
+            spriteRenderer.flipX = direction.x < 0f;
+        }
+    }
+
+    private bool IsPlayerInRange()
+    {
+        foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            if ((player.transform.position - transform.position).sqrMagnitude <= aggroRange * aggroRange)
+                return true;
+        }
+        return false;
     }
 
     private IEnumerator BeginFiringWhenNetworkReady()
@@ -72,16 +114,7 @@ public class EnemyController : RadialPower
         Vector3 direction = (destination - transform.position).normalized;
         transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
 
-        bool horizontal = Mathf.Abs(direction.x) >= Mathf.Abs(direction.z);
-
-        animator.SetBool("WalkRight", horizontal);
-        animator.SetBool("WalkUp", !horizontal);
-
-        var sr = GetComponent<SpriteRenderer>();
-        if (horizontal)
-        {
-            sr.flipX = direction.x < 0f;
-        }
+        UpdateWalkAnimation(direction);
 
         if (Vector3.Distance(transform.position, destination) < 0.01f)
         {
@@ -93,7 +126,10 @@ public class EnemyController : RadialPower
     {
         while(true)
         {
-            UsePower();
+            if (IsPlayerInRange())
+            {
+                UsePower();
+            }
             yield return new WaitForSeconds(timeBetweenFire);
         }
     }
