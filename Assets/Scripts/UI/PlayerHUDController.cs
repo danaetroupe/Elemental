@@ -10,6 +10,7 @@ public class PlayerHUDController : MonoBehaviour
     [SerializeField] private Color activeColor = Color.white;
 
     private List<Coroutine> activeAnimations = new List<Coroutine>();
+    private Dictionary<Texture2D, Sprite> spriteCache = new Dictionary<Texture2D, Sprite>();
 
     private void Start()
     {         
@@ -34,10 +35,19 @@ public class PlayerHUDController : MonoBehaviour
             bool isCurrentMask = mask == currentMask;
             displayImage.color = isCurrentMask ? activeColor : inactiveColor;
 
-            // Get the TextureAnimator from the mask
+            // Get the TextureAnimator from the mask, or fall back to the mask's still texture
             TextureAnimator animator = mask.GetComponent<TextureAnimator>();
-            Texture2D[] textures = animator.GetTextures();
-            if (animator != null && textures != null && textures.Length > 0)
+            Texture2D[] textures = animator != null ? animator.GetTextures() : null;
+            if (textures == null || textures.Length == 0)
+            {
+                var meshRenderer = mask.GetComponent<MeshRenderer>();
+                var stillTexture = meshRenderer != null && meshRenderer.sharedMaterial != null
+                    ? meshRenderer.sharedMaterial.mainTexture as Texture2D
+                    : null;
+                textures = stillTexture != null ? new[] { stillTexture } : null;
+            }
+
+            if (textures != null && textures.Length > 0)
             {
                 // Start animating this display
                 Coroutine animCoroutine = StartCoroutine(AnimateDisplay(displayImage, textures));
@@ -67,18 +77,24 @@ public class PlayerHUDController : MonoBehaviour
         float frameRate = 12f; // Adjust as needed
         float frameDelay = 1f / frameRate;
 
+        Sprite[] sprites = new Sprite[textures.Length];
+        for (int i = 0; i < textures.Length; i++)
+        {
+            Texture2D texture = textures[i];
+            if (texture == null) continue;
+
+            if (!spriteCache.TryGetValue(texture, out sprites[i]))
+            {
+                sprites[i] = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                spriteCache[texture] = sprites[i];
+            }
+        }
+
         while (true) // Loop forever until stopped
         {
-            // Convert Texture2D to Sprite
-            Texture2D currentTexture = textures[currentFrame];
-            if (currentTexture != null)
+            if (sprites[currentFrame] != null)
             {
-                Sprite sprite = Sprite.Create(
-                    currentTexture,
-                    new Rect(0, 0, currentTexture.width, currentTexture.height),
-                    new Vector2(0.5f, 0.5f)
-                );
-                displayImage.sprite = sprite;
+                displayImage.sprite = sprites[currentFrame];
             }
 
             currentFrame = (currentFrame + 1) % textures.Length;
